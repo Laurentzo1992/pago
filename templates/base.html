@@ -41,16 +41,14 @@
              
               <div class="collapse navbar-collapse" id="navbarTogglerDemo01">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                  
                   <li class="nav-item">
-                    <a class="nav-link active" aria-current="page" href=""><i class="fa fa-dashboard text-white">&nbsp;dashboard</i></a>
-                  </li>
-                  <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="{% url 'home' %}"><i class="fa fa-house text-warning">&nbsp;</i>Boutique</a>
+                    <a class="nav-link active text-white" aria-current="page" href="{% url 'home' %}"><i class="fa fa-house text-warning">&nbsp;</i>Home</a>
                   </li>
 
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Gestion Client
+                      Parametre
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                       <li><a class="dropdown-item text-primary" href="">Mesure client</a></li>
@@ -66,7 +64,7 @@
 
                   <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle text-white" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Gestion Commande
+                      Données
                     </a>
                     <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
                       <li><a class="dropdown-item text-primary" href="">Commandes</a></li>
@@ -76,17 +74,11 @@
                   </li>
 
 
-                  <li class="nav-item dropdown">
-                    <a class="nav-link dropdown-toggle text-white" href="#" id="navbarScrollingDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                      Gestion Du Personnel
-                    </a>
-                    <ul class="dropdown-menu" aria-labelledby="navbarScrollingDropdown">
-                      <li><a class="dropdown-item text-primary" href="">Personnel</a></li>
-                      <li><hr class="dropdown-divider"></li>
-                      <li><a class="dropdown-item text-primary" href="">Posts</a></li>
-                    </ul>
+                
+                  <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href=""><i class="fa fa-map text-warning">&nbsp;</i>mapping</a>
                   </li>
-  
+
                 </ul>
 
                 <div class="row mb-0 h-10">
@@ -106,8 +98,8 @@
           </nav>
 
           <div class="alert alert-dark text-center shadow-lg rounded mx-1" role="alert" style="background-color: #C0C0C0;">
-            LIM'S PRESTATION --- MODE -- HAUTE COUTURE --- BLANCHISSERIE
-            {% block add %}
+            DIRECTION  --- TECHNIQUE -- DE LA --- MARIE
+    {% block add %}
            
     {% endblock add %} 
 
@@ -157,8 +149,7 @@
         </ul>
       </div>
       <div class="col-md-4 box">
-            Laurent NIKIEMA
-            Developper Python
+            web map application
       </div>
     </div>
   </div>

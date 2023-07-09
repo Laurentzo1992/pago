@@ -11,4 +11,4 @@ def login(request):
 
 
 def home(request):
-    return render(request, 'webmapping/home.html')
+    return render(request, 'webmapping/home/home.html')

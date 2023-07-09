@@ -45,7 +45,10 @@ ROOT_URLCONF = "pago.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [
+            BASE_DIR.joinpath('templates'),
+            BASE_DIR.joinpath('static')
+            ],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
