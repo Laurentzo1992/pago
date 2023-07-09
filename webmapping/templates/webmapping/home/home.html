@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+                {% block main %} 
+					<main>
+						<div class="row mt-1">
+							{% for tenu in page_obj %}
+							<div class="col-3">
+								<div class="card">
+									<img src="{{tenu.imageURL}}" class="card-img-top" alt="{{tenu.libelle}}">
+									<div class="card-body">
+									<h5 class="card-title">{{tenu.libelle}} &nbsp; <span>{{tenu.model}}<span></h5>
+									<p class="card-text">{{tenu.model}}</p>
+									<span class="btn btn-primary">{{tenu.price|floatformat:"2g"}} FCFA</span>
+									</div>
+								</div>
+							</div>
+							{% endfor %}
+						</div>
+
+
+						<div class="pagination">
+							<span class="step-links">
+								  {% if page_obj.has_previous %}
+								  <a href="?page=1">&laquo; suivant</a>
+								  <a href="?page={{ page_obj.previous_page_number }}">précédent</a>
+								  {% endif %}
+				  
+							<span class="current">
+								  Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}.
+							</span>
+				  
+							{% if page_obj.has_next %}
+								  <a href="?page={{ page_obj.next_page_number }}">suivant</a>
+								  <a href="?page={{ page_obj.paginator.num_pages }}">précédent &raquo;</a>
+							{% endif %}
+							</span>
+					  </div>
+					</main>
+
+					
+				{% endblock main %}
