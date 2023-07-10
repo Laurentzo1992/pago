@@ -44,11 +44,11 @@ class Quartier(models.Model):
 
 
 class Type(MPTTModel):
-    type = models.CharField(max_length=30, null=True, blank=True, verbose_name="Type Infrastructure")
+    type = models.CharField(max_length=60, null=True, blank=True, unique=True, verbose_name="Type Infrastructure")
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     
     class MPTTMeta:
-        order_insertion_by = ['name']
+        order_insertion_by = ['type']
     
     def __str__(self):
         return self.type
@@ -76,4 +76,3 @@ class Infrastructure(models.Model):
     
     def __str__(self):
         return self.infrastructure 
-
