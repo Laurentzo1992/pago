@@ -13,6 +13,14 @@
     margin-left: 0px !important;
 }
 
+.navbar {
+    background-color: #048B9A !important;
+}
+
+.navbar-right {
+    justify-content: end;
+}
+
 #slideMenu {
     position: absolute;
     left: 0px;
@@ -21,6 +29,7 @@
     width: 400px;
     margin-left: -400px;
     height: 100%;
+    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.2);
     -webkit-transition: margin-left 0.5s;
     transition: margin-left 0.5s;
     overflow-y: visible;
@@ -42,6 +51,18 @@
     border-radius: 0px 5px 5px 0px;
 }
 
+.avatar {
+    font-size: 2rem;
+    margin-left: 0.75rem;
+}
+
+#admin {
+    font-weight: bold;
+    margin-left: 2rem;
+    color: white;
+    opacity: 1;
+}
+
 #collapse-button :active {
     box-shadow: 0 0 0 0;
     opacity: 1;
@@ -60,4 +81,21 @@
 #result-list {
     height: 100%;
     overflow: scroll;
+}
+
+.navbar-dark .navbar-nav .nav-link {
+    color: rgb(221, 220, 201);
+}
+
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: rgb(221, 220, 201, 0.80);
+}
+
+.navbar .nav-link:hover {
+    color: white;
+}
+
+.navbar .nav-item.active .nav-link {
+    background-color: #f0f0f0;
+    color: #048b9a;
 }

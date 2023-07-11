@@ -1,5 +1,9 @@
 $(document).ready(function () {
-
+    $('#collapse-button').on('click', function () {
+        $('#slideMenu').toggleClass('visible');
+        $('#collapse-button .fas').toggleClass('fa-rotate-180');
+    });
+    
     // Create a Leaflet map instance
     map = L.map('map').setView([12.3569, -1.5352], 13);
 
@@ -9,10 +13,7 @@ $(document).ready(function () {
         maxZoom: 18,
     }).addTo(map);
 
-    $('#collapse-button').on('click', function () {
-        $('#slideMenu').toggleClass('visible');
-        $('#collapse-button .fas').toggleClass('fa-rotate-180');
-    });
+    
 
     var jsonData;
 
