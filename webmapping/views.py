@@ -1,14 +1,14 @@
-from django.shortcuts import render
-
-
-
-
-def login(request):
-    return render(request, 'webmapping/login.html')
+from django.shortcuts import redirect, render
+from django.contrib import messages
+from webmapping.models import Type
 
 
 
 
 
-def home(request):
+
+
+def maping(request):
     return render(request, 'webmapping/home/home.html')
+
+

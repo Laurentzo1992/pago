@@ -28,6 +28,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "webmapping",
+    "mptt",
 ]
 
 MIDDLEWARE = [
@@ -71,7 +72,7 @@ WSGI_APPLICATION = "pago.wsgi.application"
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pago',
+        'NAME': 'pago1',
         'USER': 'postgres',
         'PASSWORD': 'admin',
         'HOST': 'localhost',
