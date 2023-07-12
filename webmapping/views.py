@@ -7,7 +7,7 @@ def login(request):
     return render(request, 'webmapping/login.html')
 
 
-def home(request):
+def maping(request):
     return render(request, 'webmapping/home/home.html')
 
 def map(request):
