@@ -185,7 +185,7 @@ JAZZMIN_SETTINGS = {
     "site_icon": None,
 
     # Welcome text on the login screen
-    "welcome_sign": "Bienvenue administration des données du web mappin",
+    "welcome_sign": "Bienvenue dans l'administration des données du web mapping",
 
     # Copyright on the footer
     "copyright": "logo-services",
@@ -305,5 +305,6 @@ JAZZMIN_UI_TWEAKS = {
     "theme": "slate",
     "accent": "accent-primary",
     "navbar": "navbar-white navbar-light",
+    "dark_mode_theme": "darkly",
   
 }
