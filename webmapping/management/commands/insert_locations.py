@@ -24,7 +24,7 @@ class Command(BaseCommand):
             for arr_vill in arr_vills:
                 
                 crieteria_2 = criteria_1 & (df['II3. arrondissement/Village'].fillna('') == arr_vill)
-                secteurs = df[crieteria_2]['I4. Secteur'].fillna('').unique().tolist()
+                secteurs = df[crieteria_2]['I4. Secteur'].fillna('N/A').unique().tolist()
                 
                 a, created = Arrondissement.objects.get_or_create(nom_arrondissement=arr_vill, commune=c)
 

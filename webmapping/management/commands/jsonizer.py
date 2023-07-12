@@ -98,7 +98,7 @@ class Command(BaseCommand):
                         'Accessibilité': 'N/A' if pd.isna(row['Q1.7. Accessibilité :']) else row['Q1.7. Accessibilité :'],
                         'État': 'N/A' if pd.isna(row['Q2.2. Etat']) else row['Q2.2. Etat'],
                         'Clôture': 'N/A' if pd.isna(row['Q2.3. Clôture (les lieux sont-ils entourés de mûr, grilles, etc.)']) else row['Q2.3. Clôture (les lieux sont-ils entourés de mûr, grilles, etc.)'],
-                        'Emplacement de l’infrastructure par rapport à la voie': 'N/A' if pd.isna(row['Q2.7. Emplacement de l’infrastructures par rapport à la voie']) else row['Q2.7. Emplacement de l’infrastructures par rapport à la voie'],
+                        'Emplacement de l\’infrastructure par rapport à la voie': 'N/A' if pd.isna(row['Q2.7. Emplacement de l\’infrastructures par rapport à la voie']) else row['Q2.7. Emplacement de l\’infrastructures par rapport à la voie'],
                         'État de la voie': 'N/A' if pd.isna(row['Q2.8. Quel est l’état de la voie ?']) else row['Q2.8. Quel est l’état de la voie ?'],
                         'Coordonnées géographiques': {
                             'latitude': 'N/A' if pd.isna(row['_IY1. Coordonnées géographiques_latitude']) else row['_IY1. Coordonnées géographiques_latitude'],

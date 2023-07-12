@@ -20,39 +20,43 @@ class Command(BaseCommand):
         # Liste de catégories 2 (amendé)
         regroupements = dfc['Regroupement'].fillna('Autres').unique().tolist()
 
-
+        count = 0
         for category in categories:
+            count = count + 1
+            if count == 2:
+                break
             self.stdout.write(f"{category}")
             #inserer la categorie
             root, created = Type.objects.get_or_create(type=category, parent=None)
 
             # Sélectionner les sous-catégories en fonction de la catégorie supérieure
+            criteria = df['I11. Type de l\'infrastructure'] == category
             if category == 'INFRASTRUCTURES MARCHANDS':
-                subcategories = df['Q2.1. Type d’infrastructures marchands'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q2.1. Type d’infrastructures marchands'].fillna(category).unique().tolist()
             elif category == 'CIMETIRE':
-                subcategories = df['Q13.1. Etat du cimetière'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q13.1. Etat du cimetière'].fillna(category).unique().tolist()
             elif category == 'EAU ET ASSAINISSEMENT':
-                subcategories = df['Q9.2. Quel est la nature de l’infrastructure ?'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q9.2. Quel est la nature de l’infrastructure ?'].fillna(category).unique().tolist()
             elif category == 'EQUIPEMENT SOCIO CULTUREL / LOISIRS':
-                subcategories = df['Q3.1. Type d’infrastructures socio culturel'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q3.1. Type d’infrastructures socio culturel'].fillna(category).unique().tolist()
             elif category == 'ESPACES VERTS':
-                subcategories = df['Q7.1. Types d’espaces'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q7.1. Types d’espaces'].fillna(category).unique().tolist()
             elif category == 'INFRASTRUCTURES ADMINISTRATIVE':
-                subcategories = df['Q8.1. Quel est le type d’infrastructure'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q8.1. Quel est le type d’infrastructure'].fillna(category).unique().tolist()
             elif category == 'INFRASTRUCTURES DE CONSERVATIONS':
-                subcategories = df['Q11.6. Quelle est l’utilité de l’infrastructure'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q11.6. Quelle est l’utilité de l’infrastructure'].fillna(category).unique().tolist()
             elif category == 'INFRASTRUCTURES EDUCATIVES':
-                subcategories = df['Q1.1. Établissement'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q1.1. Établissement'].fillna(category).unique().tolist()
             elif category == 'INFRASTRUTURES TOURISTIQUES':
-                subcategories = df['Q6.1. Type d’infrastructures touristiques   :'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q6.1. Type d’infrastructures touristiques   :'].fillna(category).unique().tolist()
             elif category == 'INFRASTURCTURES SANITAIRES':
-                subcategories = df['Q4.1. Type d’infrastructures sanitaire'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q4.1. Type d’infrastructures sanitaire'].fillna(category).unique().tolist()
             elif category == 'INFRASTURCTURES SPORTIVES':
-                subcategories = df['Q5.1. Type d’infrastructures sportives'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q5.1. Type d’infrastructures sportives'].fillna(category).unique().tolist()
             elif category == 'LES UNITES INDUSTRIELLES ET LES USINES':
-                subcategories = df['Q12.1. Quel est le type d’infrastructure'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q12.1. Quel est le type d’infrastructure'].fillna(category).unique().tolist()
             elif category == 'LIEUX DE CULTE':
-                subcategories = df['Q10.1.  Type du lieu de culte ?'].fillna('Autres').unique().tolist()
+                subcategories = df[criteria]['Q10.1.  Type du lieu de culte ?'].fillna(category).unique().tolist()
             else:
                 subcategories = []
 
@@ -62,7 +66,7 @@ class Command(BaseCommand):
                 if (dfc['Type'].isin([subcategory]).any()):
                     regroupement_name = dfc[dfc['Type'] == subcategory]['Regroupement'].unique().tolist()[0]
                 else:
-                    regroupement_name = 'N/A'
+                    regroupement_name = category
 
                 self.stdout.write(f"------ {regroupement_name} --> {subcategory}")
 
