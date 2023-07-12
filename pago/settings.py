@@ -151,6 +151,8 @@ MEDIA_ROOT = os.path.join(BASE_DIR, "pago/static/media")
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
+MPTT_ADMIN_LEVEL_INDENT = 100
+
 
 
 ##############################################################################
