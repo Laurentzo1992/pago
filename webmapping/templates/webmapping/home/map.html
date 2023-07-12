@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+{% block title %} Home {% endblock %}
+{% block map %}
+<script>0</script>
+    <div class="container-fluid map-container w-100 h-100 py-0 px-0">
+        <div class="container filter-container px-1" id="slideMenu">
+            <div class="col-sm-12 px-0">
+                <h3 class="text-center">Filtrer le contenu</h3>
+                <div class="row">
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="category">Categorie</label>
+                            <select id="category" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="subcategory">Sous Categorie</label>
+                            <select id="subcategory" class="form-control">
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col">
+                        <div class="form-group">
+                            <label for="third-filter">Type</label>
+                            <select id="third-filter" class="form-control">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-secondary bg-secondary" id="collapse-button"><i
+                    class="fas fa-angle-double-right"></i>
+            </button>
+            <ul id="result-list" class="list-group"></ul>
+        </div>
+        <div id="map" class="leaflet-container">
+        </div>
+    </div>
+{% endblock map %}

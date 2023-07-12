@@ -1,0 +1,107 @@
+body {
+    height: 100vh;
+    overflow: hidden;
+}
+
+main {
+    display: none;
+}
+
+.ls-banner {
+    height: 4rem;
+    display: none;
+}
+
+.map-container {
+    position: absolute !important;
+    top: 4rem;
+}
+
+nav {
+    height: 4rem;
+}
+
+#map {
+    height: 100vh !important;
+    overflow: hidden !important;
+
+    position: relative !important;
+    outline-style: none;
+}
+
+.leaflet-left {
+    left: inherit !important;
+    right: 0;
+    margin-right: 8px;
+}
+
+.visible {
+    left: 0 !important;
+    margin-left: 0px !important;
+}
+
+#slideMenu {
+    position: absolute;
+    left: 0px;
+    z-index: 1000;
+    background-color: white;
+    width: 400px;
+    margin-left: -400px;
+    height: 100%;
+    -webkit-transition: margin-left 0.5s;
+    transition: margin-left 0.5s;
+    overflow-y: visible;
+    overflow-x: visible;
+}
+
+main,
+footer,
+.sideMenu {
+    position: absolute;
+}
+
+footer {
+    bottom: 0;
+    position: fixed;
+    width: 100%;
+
+}
+
+
+
+#collapse-button {
+    width: 40px;
+    height: 80px;
+    position: absolute;
+    color: white;
+    top: 0;
+    right: -40px;
+    z-index: 2;
+    transition: right 0.3s ease;
+    border-radius: 0;
+    opacity: 0.7;
+    box-shadow: 0 0 0 0;
+    border-radius: 0px 5px 5px 0px;
+}
+
+#collapse-button :active {
+    box-shadow: 0 0 0 0;
+    opacity: 1;
+}
+
+#collapse-button :hover {
+    box-shadow: 0 0 0 0;
+    opacity: 0.8;
+}
+
+#collapse-button :focus {
+    box-shadow: 0 0 0 0;
+    opacity: 0.5;
+}
+
+#result-list {
+    height: 100%;
+    overflow: scroll;
+}
+
+/* test css */
