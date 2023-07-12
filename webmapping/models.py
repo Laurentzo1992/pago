@@ -65,11 +65,33 @@ class Status(models.Model):
     def __str__(self):
         return self.status
     
-class Infrastructure(models.Model):
-    infrastructure = models.CharField(max_length=30, null=True, blank=True, verbose_name="Infrastructure")
-    type = models.ForeignKey(Type, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Type d\'infrastructure")
-    status = models.ForeignKey(Status, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Status de  l\'infrastructure")
-    quartier = models.ForeignKey(Quartier, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Quartier de l'intrastructure")
+class Repondant(models.Model):
+    name = models.CharField(max_length=30, null=True, blank=True, verbose_name="Status Infrastructure")
+    contact = models.CharField(max_length=30, null=True, blank=True, verbose_name="Status Infrastructure")
+    qualite = models.CharField(max_length=30, null=True, blank=True, verbose_name="Status Infrastructure")
     
+    
+    def __str__(self):
+        return self.status
+    
+class Infrastructure(models.Model):
+    nom = models.CharField(max_length=30, null=True, blank=True, verbose_name="Infrastructure")
+    
+    type = models.ForeignKey(Type, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Type d\'infrastructure")
+    quartier = models.ForeignKey(Quartier, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Quartier de l'intrastructure")
+    status = models.ForeignKey(Status, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Status de  l\'infrastructure")
+    repondant = models.ForeignKey(Repondant, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Quartier de l'intrastructure")
+    
+    etat_voie = models.CharField(max_length=200, null=True, blank=True, verbose_name="État de la voie")
+    emplacement = models.CharField(max_length=200, null=True, blank=True, verbose_name="Emplacement de l’infrastructure par rapport à la voie")
+    cloture = models.CharField(max_length=200, null=True, blank=True, verbose_name="État de la voie")
+    accessibilite = models.CharField(max_length=200, null=True, blank=True, verbose_name="État de la voie")
+    etat = models.CharField(max_length=200, null=True, blank=True, verbose_name="État de la voie")
+    
+    latitude = models.CharField(max_length=30, null=True, blank=True, verbose_name="Latitude")
+    longitude = models.CharField(max_length=30, null=True, blank=True, verbose_name="Longitude")
+    altitude = models.CharField(max_length=30, null=True, blank=True, verbose_name="Altitude")
+    precision = models.CharField(max_length=30, null=True, blank=True, verbose_name="Precision")
+
     def __str__(self):
         return self.infrastructure 
