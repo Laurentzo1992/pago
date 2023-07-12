@@ -19,7 +19,7 @@ class Command(BaseCommand):
             arr_vills = df[criteria_1]['II3. arrondissement/Village'].fillna('').unique().tolist()
             
             c, created = Commune.objects.get_or_create(nom_commune=commune)
-
+            self.stdout.write(f"{commune}")
             
             for arr_vill in arr_vills:
                 
