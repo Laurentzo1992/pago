@@ -1,12 +1,7 @@
 from django.contrib import admin
 from .models import *
-from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
-from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
-from mptt.admin import DraggableMPTTAdmin
-
-
 from mptt.admin import TreeRelatedFieldListFilter
 
 """ admin.site.register(
@@ -26,8 +21,6 @@ admin.site.register(Infrastructure)
 admin.site.register(Arrondissement)
 admin.site.register(Secteur)
 admin.site.register(Quartier)
-admin.site.register(Status)
-admin.site.register(Infrastructure)
 admin.site.register(Status)
 
 admin.site.register(
