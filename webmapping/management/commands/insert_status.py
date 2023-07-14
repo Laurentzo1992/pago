@@ -13,6 +13,7 @@ class Command(BaseCommand):
      
      
      def handle(self, **options):
+        print('Inserting status...')
         # Charger le fichier Excel dans un DataFrame
         df = pd.read_excel('webmapping/management/data.xlsx', sheet_name='BASE DES DONNEES DU PAGO')
         

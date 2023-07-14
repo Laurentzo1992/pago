@@ -9,6 +9,7 @@ class Command(BaseCommand):
         parser.add_argument("--file", required=False, type=int)
 
     def handle(self, **options):
+        print('Inserting locations...')
         # Charger le fichier Excel dans un DataFrame
         df = pd.read_excel("webmapping/management/data.xlsx", sheet_name='BASE DES DONNEES DU PAGO')
 
@@ -32,8 +33,8 @@ class Command(BaseCommand):
 
                 for secteur in secteurs:
                     
-                    crieteria_3 = crieteria_2 & (df['I4. Secteur'].fillna('') == secteur)
-                    quartiers = df[crieteria_3]['I4. Nom du quartier'].fillna('').unique().tolist()
+                    criteria = crieteria_2 & (df['I4. Secteur'].fillna('N/A') == secteur)
+                    quartiers = df[criteria]['I4. Nom du quartier'].fillna('').unique().tolist()
                     
                     
                     s, created = Secteur.objects.get_or_create(nom_secteur=secteur, arrondissement=a)
@@ -41,9 +42,6 @@ class Command(BaseCommand):
                     self.stdout.write(f"    - {secteur}")
 
                     for quartier in quartiers:
-                        quartier = str(quartier).strip()
-                        if quartier == 'nan':
-                            quartier = ''
                         q, created = Quartier.objects.get_or_create(nom_quartier=quartier, secteur=s)
                         
                         self.stdout.write(f"      - {quartier}")

@@ -75,7 +75,7 @@ class Repondant(models.Model):
         return self.status
     
 class Infrastructure(models.Model):
-    nom = models.CharField(max_length=30, null=True, blank=True, verbose_name="Infrastructure")
+    nom = models.CharField(max_length=300, null=True, blank=True, verbose_name="Infrastructure")
     
     type = models.ForeignKey(Type, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Type d\'infrastructure")
     quartier = models.ForeignKey(Quartier, null=True, blank=True, on_delete=models.CASCADE, verbose_name="Quartier de l'intrastructure")
