@@ -94,4 +94,4 @@ class Infrastructure(models.Model):
     precision = models.CharField(max_length=30, null=True, blank=True, verbose_name="Precision")
 
     def __str__(self):
-        return self.infrastructure 
+        return self.nom 
