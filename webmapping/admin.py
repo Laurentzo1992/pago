@@ -1,12 +1,7 @@
 from django.contrib import admin
 from .models import *
-from django.contrib import admin
 from mptt.admin import DraggableMPTTAdmin
-from django.contrib import admin
 from mptt.admin import MPTTModelAdmin
-from mptt.admin import DraggableMPTTAdmin
-
-
 from mptt.admin import TreeRelatedFieldListFilter
 
 """ admin.site.register(
