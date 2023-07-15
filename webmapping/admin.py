@@ -17,11 +17,13 @@ from mptt.admin import TreeRelatedFieldListFilter
     ),
 ) """
 admin.site.register(Commune)
-admin.site.register(Infrastructure)
+#admin.site.register(Infrastructure)
 admin.site.register(Arrondissement)
 admin.site.register(Secteur)
 admin.site.register(Quartier)
 admin.site.register(Status)
+admin.site.register(Infrastructure)
+
 
 admin.site.register(
     Type,
