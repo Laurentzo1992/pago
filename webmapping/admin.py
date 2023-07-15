@@ -22,7 +22,6 @@ admin.site.register(Arrondissement)
 admin.site.register(Secteur)
 admin.site.register(Quartier)
 admin.site.register(Status)
-admin.site.register(Infrastructure)
 
 
 admin.site.register(
@@ -38,5 +37,12 @@ admin.site.register(
     ),
 )
 
+
+class InfrastructureAdmin(admin.ModelAdmin):
+    list_display = ["nom", "type", "quartier", "status"]
+    list_per_page = 10
+
+
+admin.site.register(Infrastructure, InfrastructureAdmin)
 
 
