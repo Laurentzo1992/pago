@@ -50,7 +50,7 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
-        <div class="navbar-collapse justify-content-end align-items-center w-100 order-3 dual-collapse2">
+        {% comment %} <div class="navbar-collapse justify-content-end align-items-center w-100 order-3 dual-collapse2">
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
                     <a class="nav-link py-0" href="#">
@@ -60,43 +60,50 @@
                     </a>
                 </li>
             </ul>
-        </div>
+        </div> {% endcomment %}
     </nav>
 
     <script>0</script>
     <div class="container-fluid w-100 h-100 py-0 px-0">
-        <div class="container filter-container px-1" id="slideMenu">
+        <div class="container filter-container px-1  mt-5" id="slideMenu">
             <div class="col-sm-12 px-0">
-                <h3 class="text-center">Filtrer le contenu</h3>
+                <h4 class="text-center">Filtrer le contenu</h4>
                 <div class="row">
-                    <div class="col">
+                    <div class="col mt-2">
                         <div class="form-group">
                             <label for="category">Categorie</label>
                             <select id="category" class="form-control">
                             </select>
                         </div>
                     </div>
-                    <div class="col">
+                    <div class="col mt-2">
                         <div class="form-group">
                             <label for="subcategory">Sous Categorie</label>
                             <select id="subcategory" class="form-control">
                             </select>
                         </div>
                     </div>
-                    <div class="col">
+                    {% comment %} <div class="col">
                         <div class="form-group">
                             <label for="third-filter">Type</label>
                             <select id="third-filter" class="form-control">
                                 <option value="">Select...</option>
                             </select>
                         </div>
-                    </div>
+                    </div> {% endcomment %}
                 </div>
             </div>
-            <button class="btn btn-secondary bg-secondary" id="collapse-button">
-                <i class="fas fa-angle-double-right"></i>
+            <button class="btn btn-secondary bg-danger" id="collapse-button"><i
+                    class="fas fa-angle-double-right"></i>
             </button>
-            <ul id="result-list" class="list-group"></ul>
+            {% comment %} <ul id="result-list" class="list-group"></ul> {% endcomment %}
+           
+            <script>
+                var results = JSON.parse('{{ results_json|escapejs }}');
+                // Now you can work with the 'results' variable as a JavaScript object
+                // and display the data as desired.
+            </script>
+            
         </div>
         <div id="map" class="leaflet-container">
         </div>

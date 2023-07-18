@@ -29,7 +29,6 @@ admin.site.register(Status)
 
 
 
-
 admin.site.register(
     Type,
     DraggableMPTTAdmin,
