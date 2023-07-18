@@ -22,7 +22,7 @@ from django.utils.html import format_html
 admin.site.register(Commune)
 #admin.site.register(Infrastructure)
 admin.site.register(Arrondissement)
-admin.site.register(Secteur)
+# admin.site.register(Secteur)
 admin.site.register(Quartier)
 admin.site.register(Status)
 
@@ -64,4 +64,9 @@ class InfrastructureAdmin(admin.ModelAdmin):
 
 admin.site.register(Infrastructure, InfrastructureAdmin)
 
+class SecteurAdmin(admin.ModelAdmin):
+    list_display = ["nom_secteur", "arrondissement"]
+    list_per_page = 10
+
+admin.site.register(Secteur, SecteurAdmin)
 
