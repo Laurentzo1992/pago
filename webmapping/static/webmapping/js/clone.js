@@ -18,7 +18,11 @@ var menu_width = 400; //Default menu width
 
 pointLayers = []
 
+var selectedTypes = [];
+
 $(document).ready(function () {
+
+
     if (window.mobileAndTabletcheck()) {
         menu_width = 250; //Reduce menu width for portable devices
         $("#slide_menu").css('width', '250px');
@@ -71,31 +75,28 @@ $(document).ready(function () {
     });
     map.addControl(ctlZoomBox);
 
-    //Get list of aliases
-    $.getJSON("./bumigeb_champs.json")
-        .done(function (data) {
-            if (data !== undefined)
-                aliases = data;
-        })
-        .fail();
-    var toto = GeoServerURL + "wms?service=WMS&version=1.1.1&request=GetCapabilities"
     $.get("/api/types")
-        .done(parseTypes)
+        .done(function (types) {
+            parseTypes(types);
+            $.get("/api/locations")
+                .done(parseLocations)
+                .fail(function () {
+                    alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
+                });
+        })
         .fail(function () {
             alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
         });
 
-    $.get("/api/locations")
-        .done(parseLocations)
-        .fail(function () {
-            alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
-        });
+
 
     map.on('click', function (evt) {
         vGetFeatureInfo(evt);
     });
 
     map.on('zoomend', vShowHideLayersToZoom);
+
+
 
 });
 
@@ -104,11 +105,45 @@ function parseTypes(types) {
     types.forEach(type => {
         createTypeAccordion(type)
     });
+
 }
 
 function parseLocations(communes) {
     communes.forEach(commune => {
-        createCommuneAccordion(commune)
+        createCommuneAccordion(commune);
+    });
+
+    // Listen to click events on checkboxes
+    $("input[type=checkbox]").on("change", function (event) {
+        $(this).removeClass('bg-primary');
+        $(this).removeClass('border-primary');
+        $(this).removeClass('bg-danger');
+        $(this).removeClass('border-danger');
+        $(this).removeAttr("style");
+
+        event.stopPropagation();
+        // toggleChildren(this);
+        if ($(this).parent().hasClass('accordion-button')) {
+            // event.stopPropagation();
+            toggleChildren(this);
+        }
+
+        if ($(this).data('parent')) {
+            parent = $(this).data('parent');
+        } else if ($(this).data('commune')) {
+            parent = $(this).data('commune');
+        } else if ($(this).data('arrondissement')) {
+            parent = $(this).data('arrondissement');
+        } else if ($(this).data('secteur')) {
+            parent = $(this).data('secteur')
+        }
+
+        if (parent)
+            updateParentCheckbox(parent);
+
+        // console.log('me');
+        // if (this.id.startsWith('checkbox-type-')) {
+        // }
     });
 }
 
@@ -116,7 +151,7 @@ function parseLocations(communes) {
 
 
 // Helper function to generate accordion items
-function generateAccordionItem(item, level) {
+function generateAccordionItem(item, level, parentId) {
 
     if (item.children.length > 0) {
         const accordionItem = document.createElement("div");
@@ -135,13 +170,14 @@ function generateAccordionItem(item, level) {
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
         checkbox.id = `checkbox-type-${item.id}`;
+        checkbox.setAttribute("data-parent", `checkbox-type-${parentId}`);
+        formCheck.appendChild(checkbox);
 
         const label = document.createElement("label");
         label.className = "form-check-label";
         label.setAttribute("for", `checkbox-type-${item.id}`);
         label.textContent = item.name;
 
-        formCheck.appendChild(checkbox);
         formCheck.appendChild(label);
 
 
@@ -160,7 +196,7 @@ function generateAccordionItem(item, level) {
         item.children.forEach(child => {
             // Check if the child item has already been processed to avoid duplicates
             if (!child.processed) {
-                accordionBody.appendChild(generateAccordionItem(child, level + 1));
+                accordionBody.appendChild(generateAccordionItem(child, level + 1, item.id));
                 child.processed = true; // Mark the child as processed
             }
         });
@@ -179,6 +215,7 @@ function generateAccordionItem(item, level) {
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
         checkbox.id = `checkbox-type-${item.id}`;
+        checkbox.setAttribute("data-parent", `checkbox-type-${parentId}`);
 
         const label = document.createElement("label");
         label.className = "form-check-label";
@@ -281,21 +318,22 @@ function generateArrondissementAccordion(arrondissement, commune) {
 
         const heading = document.createElement("h2");
         heading.className = "accordion-header";
-        heading.id = `heading-arrondissement-${commune.id}-${arrondissement.id}`;
+        heading.id = `heading-arrondissement-${arrondissement.id}`;
 
         const formCheck = document.createElement("div");
         formCheck.className = "form-check accordion-button";
         formCheck.dataset.bsToggle = "collapse";
-        formCheck.dataset.bsTarget = `#collapse-arrondissement-${commune.id}-${arrondissement.id}`;
+        formCheck.dataset.bsTarget = `#collapse-arrondissement-${arrondissement.id}`;
 
         const checkbox = document.createElement("input");
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
-        checkbox.id = `checkbox-arrondissement-${commune.id}-${arrondissement.id}`;
+        checkbox.id = `checkbox-arrondissement-${arrondissement.id}`;
+        checkbox.setAttribute('data-commune', 'checkbox-commune-' + commune.id);
 
         const label = document.createElement("label");
         label.className = "form-check-label";
-        label.setAttribute("for", `checkbox-arrondissement-${commune.id}-${arrondissement.id}`);
+        label.setAttribute("for", `checkbox-arrondissement-${arrondissement.id}`);
         label.textContent = arrondissement.name;
 
         formCheck.appendChild(checkbox);
@@ -307,9 +345,9 @@ function generateArrondissementAccordion(arrondissement, commune) {
         accordionItem.appendChild(heading);
 
         const accordionCollapse = document.createElement("div");
-        accordionCollapse.id = `collapse-arrondissement-${commune.id}-${arrondissement.id}`;
+        accordionCollapse.id = `collapse-arrondissement-${arrondissement.id}`;
         accordionCollapse.className = "accordion-collapse collapse";
-        accordionCollapse.setAttribute("aria-labelledby", `heading-arrondissement-${commune.id}-${arrondissement.id}`);
+        accordionCollapse.setAttribute("aria-labelledby", `heading-arrondissement-${arrondissement.id}`);
 
         const accordionBody = document.createElement("div");
         accordionBody.className = "accordion-body";
@@ -335,11 +373,13 @@ function generateArrondissementAccordion(arrondissement, commune) {
         const checkbox = document.createElement("input");
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
-        checkbox.id = `checkbox-arrondissement-${commune.id}-${arrondissement.id}`;
+        checkbox.id = `checkbox-arrondissement-${arrondissement.id}`;
+        checkbox.setAttribute('data-commune', 'checkbox-commune-' + commune.id);
+
 
         const label = document.createElement("label");
         label.className = "form-check-label";
-        label.setAttribute("for", `checkbox-arrondissement-${commune.id}-${arrondissement.id}`);
+        label.setAttribute("for", `checkbox-arrondissement-${arrondissement.id}`);
         label.textContent = arrondissement.name;
 
         formCheck.appendChild(checkbox);
@@ -359,21 +399,22 @@ function generateSecteurAccordion(secteur, arrondissement) {
 
         const heading = document.createElement("h2");
         heading.className = "accordion-header";
-        heading.id = `heading-secteur-${arrondissement.id}-${secteur.id}`;
+        heading.id = `heading-secteur-${secteur.id}`;
 
         const formCheck = document.createElement("div");
         formCheck.className = "form-check accordion-button";
         formCheck.dataset.bsToggle = "collapse";
-        formCheck.dataset.bsTarget = `#collapse-secteur-${arrondissement.id}-${secteur.id}`;
+        formCheck.dataset.bsTarget = `#collapse-secteur-${secteur.id}`;
 
         const checkbox = document.createElement("input");
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
-        checkbox.id = `checkbox-secteur-${arrondissement.id}-${secteur.id}`;
+        checkbox.id = `checkbox-secteur-${secteur.id}`;
+        checkbox.setAttribute('data-arrondissement', 'checkbox-arrondissement-' + arrondissement.id);
 
         const label = document.createElement("label");
         label.className = "form-check-label";
-        label.setAttribute("for", `checkbox-secteur-${arrondissement.id}-${secteur.id}`);
+        label.setAttribute("for", `checkbox-secteur-${secteur.id}`);
         label.textContent = secteur.name;
 
         formCheck.appendChild(checkbox);
@@ -385,9 +426,9 @@ function generateSecteurAccordion(secteur, arrondissement) {
         accordionItem.appendChild(heading);
 
         const accordionCollapse = document.createElement("div");
-        accordionCollapse.id = `collapse-secteur-${arrondissement.id}-${secteur.id}`;
+        accordionCollapse.id = `collapse-secteur-${secteur.id}`;
         accordionCollapse.className = "accordion-collapse collapse";
-        accordionCollapse.setAttribute("aria-labelledby", `heading-secteur-${arrondissement.id}-${secteur.id}`);
+        accordionCollapse.setAttribute("aria-labelledby", `heading-secteur-${secteur.id}`);
 
         const accordionBody = document.createElement("div");
         accordionBody.className = "accordion-body";
@@ -413,11 +454,13 @@ function generateSecteurAccordion(secteur, arrondissement) {
         const checkbox = document.createElement("input");
         checkbox.className = "form-check-input";
         checkbox.type = "checkbox";
-        checkbox.id = `checkbox-secteur-${arrondissement.id}-${secteur.id}`;
+        checkbox.id = `checkbox-secteur-${secteur.id}`;
+        checkbox.setAttribute('data-arrondissement', 'checkbox-arrondissement-' + arrondissement.id);
+
 
         const label = document.createElement("label");
         label.className = "form-check-label";
-        label.setAttribute("for", `checkbox-secteur-${arrondissement.id}-${secteur.id}`);
+        label.setAttribute("for", `checkbox-secteur-${secteur.id}`);
         label.textContent = secteur.name;
 
         formCheck.appendChild(checkbox);
@@ -441,11 +484,12 @@ function generateQuartierAccordion(quartier, secteur) {
     const checkbox = document.createElement("input");
     checkbox.className = "form-check-input";
     checkbox.type = "checkbox";
-    checkbox.id = `checkbox-quartier-${secteur.id}-${quartier.id}`;
+    checkbox.id = `checkbox-quartier-${quartier.id}`;
+    checkbox.setAttribute('data-secteur', 'checkbox-secteur-' + secteur.id);
 
     const label = document.createElement("label");
     label.className = "form-check-label";
-    label.setAttribute("for", `checkbox-quartier-${secteur.id}-${quartier.id}`);
+    label.setAttribute("for", `checkbox-quartier-${quartier.id}`);
     label.textContent = quartier.name;
 
     formCheck.appendChild(checkbox);
@@ -462,7 +506,7 @@ function generateQuartierAccordion(quartier, secteur) {
 // Helper function to create the accordion with data
 function createTypeAccordion(data) {
     const accordionContainer = document.getElementById("types-accordion");
-    accordionContainer.appendChild(generateAccordionItem(data));
+    accordionContainer.appendChild(generateAccordionItem(data, 0, null));
 }
 
 function createCommuneAccordion(location) {
@@ -473,43 +517,117 @@ function createCommuneAccordion(location) {
 var markers = new Map();
 var pointLayer = L.layerGroup();
 
-function checkboxCallback() {
-    model = (this.id).match(/[a-zA-Z]+/g)[1]
-    ids = (this.id).match(/\d+/g)
+// Fonction pour cocher/décocher automatiquement les checkboxes enfants
+function toggleChildren(parentCheckbox) {
+    var isChecked = parentCheckbox.checked;
+    var parentDiv = $(parentCheckbox.closest('.accordion-item')).find('.accordion-body')
 
-    
-    if (cid >= 0 && cid < aOverlays.length) {
-        $("#legend").css('display', 'none');
-        $('#transp-slider' + cid).css('display', 'none');
-        if (this.checked) {
-            aOverlays[cid].layer.addTo(map);
-            aOverlays[cid].active = true;
-            // Only put symbol if not raster
-            if (aOverlays[cid].geometry > ciGeometry_Raster)
-                $('#symbol' + cid).css('display', 'block');
+    // Trouver tous les checkboxes enfants dans le div parent
+    var childrenCheckboxes = parentDiv.find('.form-check-input');
 
-            //Add transparency slider for raster and polygons
-            if (aOverlays[cid].geometry <= ciGeometry_Polygon) {
-                $('#transp-slider' + cid).css('display', 'block');
-                var grID = aOverlays[cid].groupID;
-                $('#panel' + grID).css('maxHeight', $('#panel' + grID).prop('scrollHeight') + 'px');
-            }
+    childrenCheckboxes.each(function () {
 
+        // Effacer ma mise en forme
+        $(this).removeClass('bg-primary');
+        $(this).removeClass('border-primary');
+        $(this).removeClass('bg-danger');
+        $(this).removeClass('border-danger');
+        $(this).removeAttr("style");
+
+        // Cocher/decocher le checkbox enfant
+        this.checked = isChecked;
+        this.indeterminate = false;
+
+        // Récupérer l'ID du type (extrait de l'attribut ID)
+        var typeId = this.id.replace('checkbox-type-', '');
+
+        // Mettre à jour la liste des types sélectionnés
+        var index = selectedTypes.indexOf(typeId);
+        if (isChecked && index === -1) {
+            selectedTypes.push(typeId);
+        } else if (!isChecked && index !== -1) {
+            selectedTypes.splice(index, 1);
         }
-        else {
-            aOverlays[cid].layer.removeFrom(map);
-            aOverlays[cid].active = false;
+    });
+    // getInfrastructures();
+}
 
-            $('#symbol' + cid).css('display', 'none');
+function updateParentCheckbox(parentId) {
+    if (!parentId)
+        return;
 
 
-            while (selectedFeatureLayers.length > 0) {
-                map.removeLayer(selectedFeatureLayers.pop());
+    var parentCheckbox;
+    while (parentId) {
+        parentCheckbox = $('#' + parentId);
+
+        if (!parentCheckbox)
+            return;
+
+        var match = parentId.match(/[a-zA-Z]+/g);
+        model = match[1];
+
+        if (model == 'type')
+            model = 'parent';
+
+        var childCheckboxes = $("input[data-" + model + "='" + parentId + "']");
+        var checkedCount = childCheckboxes.filter(":checked").length;
+        var totalCount = childCheckboxes.length;
+
+        parentCheckbox.removeClass('bg-primary');
+        parentCheckbox.removeClass('border-primary');
+        parentCheckbox.removeClass('bg-danger');
+        parentCheckbox.removeClass('border-danger');
+        parentCheckbox.removeAttr("style");
+
+        // Array to store indeterminate checkboxes
+        var indeterminateCheckboxes = [];
+
+        // Loop through the checkboxes and check if they are indeterminate
+        childCheckboxes.each(function () {
+            if ($(this).prop("indeterminate")) {
+                indeterminateCheckboxes.push(this);
             }
-            map.closePopup();
+        });
+
+        // Get the count of indeterminate checkboxes
+        var count = indeterminateCheckboxes.length;
+
+        if (checkedCount === 0) {
+            parentCheckbox.prop("indeterminate", count > 0);
+            parentCheckbox.prop("checked", false);
+            if (count > 0) {
+                classes = 'bg-danger border-danger';
+            }
+        } else if (checkedCount === totalCount) {
+            parentCheckbox.prop("indeterminate", false);
+            parentCheckbox.prop("checked", true);
+            
+            classes = 'bg-primary border-primary';
+            parentCheckbox.css('border-color', '#0d6efd !important');
+        } else {
+            parentCheckbox.prop("indeterminate", true);
+            parentCheckbox.prop("checked", false);
+            
+            
+            classes = 'bg-danger border-danger';
+        }
+        parentCheckbox.addClass(classes);
+
+        if (parentCheckbox.data('parent')) {
+            parentId = parentCheckbox.data('parent');
+        } else if (parentCheckbox.data('commune')) {
+            parentId = parentCheckbox.data('commune');
+        } else if (parentCheckbox.data('arrondissement')) {
+            parentId = parentCheckbox.data('arrondissement');
+        } else if (parentCheckbox.data('secteur')) {
+            parentId = parentCheckbox.data('secteur');
+        } else {
+            parentId = undefined;
         }
     }
 }
+
 
 
 

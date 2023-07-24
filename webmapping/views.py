@@ -28,6 +28,7 @@ def get_types(request):
     def build_tree(type):
         return {
             'id': type.id,
+            'level': type.level,
             'name': type.type,
             'children': [build_tree(child) for child in type.children.all()]
         }
@@ -80,6 +81,19 @@ def get_locations(request):
 
     # Return the JSON response
     return JsonResponse(json_data, safe=False)
+
+def get_infrastructures(request):
+    if request.method == 'GET':
+        selected_types = request.GET.getlist('selected_types[]')
+
+        # Récupérez les infrastructures liées aux catégories sélectionnées
+        infrastructures = Infrastructure.objects.filter(type__in=selected_types)
+
+        # Sérialisez les infrastructures en JSON
+        infrastructure_data = list(infrastructures.values())
+
+        # Renvoyer la réponse JSON
+        return JsonResponse(infrastructure_data, safe=False)
 
 
 
