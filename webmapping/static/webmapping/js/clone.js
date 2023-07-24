@@ -592,7 +592,7 @@ function updateParentCheckbox(parentId) {
 
         // Get the count of indeterminate checkboxes
         var count = indeterminateCheckboxes.length;
-
+        classes = '';
         if (checkedCount === 0) {
             parentCheckbox.prop("indeterminate", count > 0);
             parentCheckbox.prop("checked", false);
@@ -603,8 +603,6 @@ function updateParentCheckbox(parentId) {
             parentCheckbox.prop("indeterminate", false);
             parentCheckbox.prop("checked", true);
             
-            classes = 'bg-primary border-primary';
-            parentCheckbox.css('border-color', '#0d6efd !important');
         } else {
             parentCheckbox.prop("indeterminate", true);
             parentCheckbox.prop("checked", false);
