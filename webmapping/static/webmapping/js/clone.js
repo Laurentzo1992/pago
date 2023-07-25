@@ -81,11 +81,11 @@ $(document).ready(function () {
             $.get("/api/locations")
                 .done(parseLocations)
                 .fail(function () {
-                    alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
+                    alert("Impossible de joindre le serveur");
                 });
         })
         .fail(function () {
-            alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
+            alert("Impossible de joindre le serveur");
         });
 
 
@@ -121,7 +121,7 @@ function parseLocations(communes) {
         $(this).removeClass('border-danger');
         $(this).removeAttr("style");
 
-        event.stopPropagation();
+        event.stopImmediatePropagation();
         // toggleChildren(this);
         if ($(this).parent().hasClass('accordion-button')) {
             // event.stopPropagation();
@@ -162,7 +162,7 @@ function generateAccordionItem(item, level, parentId) {
         heading.id = `heading-type-${item.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button";
+        formCheck.className = "form-check accordion-button collapsed";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-type-${item.id}`;
 
@@ -243,7 +243,7 @@ function generateCommuneAccordion(commune) {
         heading.id = `heading-commune-${commune.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button";
+        formCheck.className = "form-check accordion-button collapsed";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-commune-${commune.id}`;
 
@@ -321,7 +321,7 @@ function generateArrondissementAccordion(arrondissement, commune) {
         heading.id = `heading-arrondissement-${arrondissement.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button";
+        formCheck.className = "form-check accordion-button collapsed";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-arrondissement-${arrondissement.id}`;
 
@@ -402,7 +402,7 @@ function generateSecteurAccordion(secteur, arrondissement) {
         heading.id = `heading-secteur-${secteur.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button";
+        formCheck.className = "form-check accordion-button collapsed";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-secteur-${secteur.id}`;
 
