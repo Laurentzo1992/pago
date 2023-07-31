@@ -15,7 +15,7 @@ SECRET_KEY = "django-insecure-hn-_rsaehu#tx7^b&*05tb5#^-(w!p#i(r7l&mox$+su@i*$@6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "webmapping",
     "mptt",
+    "django_cleanup.apps.CleanupConfig",
 ]
 
 MIDDLEWARE = [

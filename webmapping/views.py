@@ -16,10 +16,11 @@ def map(request):
 
 
 def clone(request):
-    results = Infrastructure.objects.all() 
-    results_json = json.dumps(list(results.values()))
-    context = {'results_json': results_json}
-    return render(request, 'webmapping/clone.html', context)
+    #results = Infrastructure.objects.all() 
+    #results_json = json.dumps(list(results.values()))
+    guide = Guide.objects.all()
+    context = {"guide":guide}
+    return render(request, 'webmapping/clone.html', context)    
 
 
 def get_types(request):
@@ -80,11 +81,13 @@ def get_locations(request):
         json_data.append(commune_data)
 
     # Return the JSON response
+    #print(communes)
     return JsonResponse(json_data, safe=False)
 
 def get_infrastructures(request):
     if request.method == 'GET':
         selected_types = request.GET.getlist('selected_types[]')
+        print(selected_types)
 
         # Récupérez les infrastructures liées aux catégories sélectionnées
         infrastructures = Infrastructure.objects.filter(type__in=selected_types)
@@ -93,7 +96,14 @@ def get_infrastructures(request):
         infrastructure_data = list(infrastructures.values())
 
         # Renvoyer la réponse JSON
+        print(infrastructure_data)
         return JsonResponse(infrastructure_data, safe=False)
+    
+    
+    
+    
+    
+
 
 
 

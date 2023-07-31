@@ -27,10 +27,10 @@ $(document).ready(function () {
         menu_width = 250; //Reduce menu width for portable devices
         $("#slide_menu").css('width', '250px');
     }
-    map = new L.map('map', { maxZoom: 18, zoomControl: false });
+    map = new L.map('map', {maxZoom: 18, zoomControl: false});
     //tileLayer: {maxNativeZoom: 19}
 
-    map.setView([12.3569, -1.5352], 13); //Coordinates and zoom level
+    map.setView([12.3569, -1.5352], 10); //Coordinates and zoom level
     //
     // Create base layers objects
     var osm = new L.TileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -75,6 +75,9 @@ $(document).ready(function () {
     });
     map.addControl(ctlZoomBox);
 
+
+
+
     $.get("/api/types")
         .done(function (types) {
             parseTypes(types);
@@ -83,6 +86,18 @@ $(document).ready(function () {
                 .fail(function () {
                     alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
                 });
+                ///////////////////////////////////////////////////////
+
+                // infrastructure data and locate
+
+                ///////////////////////////////////////////////////////
+                
+                $.get("/api/infrastructures")
+                .done(parseLocations)
+                .fail(function () {
+                    alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
+                });
+            ////////////////////////////////////////////////////////////////
         })
         .fail(function () {
             alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");

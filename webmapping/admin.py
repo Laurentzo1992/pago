@@ -25,6 +25,7 @@ admin.site.register(Arrondissement)
 # admin.site.register(Secteur)
 admin.site.register(Quartier)
 admin.site.register(Status)
+admin.site.register(Guide)
 
 
 
