@@ -112,21 +112,41 @@ button.accordion {
     transition: 0.4s;
 }
 
-button.accordion.active,
-button.accordion:hover {
+.accordion-button.active,
+.accordion-button:hover {
     background-color: #ddd;
 }
 
-button.accordion:after {
+.accordion-button:not(.collapsed)::after {
+    content: "\2212";
+    transform: rotate(180deg);
+}
+
+
+.accordion-button:after {
     content: '\002B';
+    text-align: center;
     color: #777;
     font-weight: bold;
     float: right;
     margin-left: 5px;
+
+    flex-shrink: 0;
+    width: 1.25rem;
+    height: 1.25rem;
+    margin-left: auto;
+    // content: "";
+    background-image: inherit !important;
+    background-repeat: no-repeat;
+    background-size: 1.25rem;
+    transition: transform .2s ease-in-out;
 }
 
-button.accordion.active:after {
-    content: "\2212";
+
+
+.accordion-button.collapsed::after {
+    content: '\002B';
+    transform: rotate(-180deg);
 }
 
 .panel {

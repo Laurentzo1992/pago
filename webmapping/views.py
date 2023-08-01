@@ -90,7 +90,10 @@ def get_infrastructures(request):
         print(selected_types)
 
         # Récupérez les infrastructures liées aux catégories sélectionnées
-        infrastructures = Infrastructure.objects.filter(type__in=selected_types)
+        if(len(selected_types) > 0):
+            infrastructures = Infrastructure.objects.filter(type__in=selected_types)
+        else:
+            infrastructures = Infrastructure.objects.filter()
 
         # Sérialisez les infrastructures en JSON
         infrastructure_data = list(infrastructures.values())

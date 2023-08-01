@@ -103,21 +103,36 @@ button.accordion {
   transition: 0.4s;
 }
 
-button.accordion.active,
-button.accordion:hover {
+.accordion-button.active,
+.accordion-button:hover {
   background-color: #ddd;
 }
 
-button.accordion:after {
+.accordion-button:not(.collapsed)::after {
+  content: "−";
+  transform: rotate(180deg);
+}
+
+.accordion-button:after {
   content: "+";
+  text-align: center;
   color: #777;
   font-weight: bold;
   float: right;
   margin-left: 5px;
+  flex-shrink: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-left: auto;
+  background-image: inherit !important;
+  background-repeat: no-repeat;
+  background-size: 1.25rem;
+  transition: transform 0.2s ease-in-out;
 }
 
-button.accordion.active:after {
-  content: "−";
+.accordion-button.collapsed::after {
+  content: "+";
+  transform: rotate(-180deg);
 }
 
 .panel {
