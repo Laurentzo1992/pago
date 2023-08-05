@@ -87,7 +87,7 @@ def get_locations(request):
 def get_infrastructures(request):
     if request.method == 'GET':
         selected_types = request.GET.getlist('selected_types[]')
-        print(selected_types)
+        #print(selected_types)
 
         # Récupérez les infrastructures liées aux catégories sélectionnées
         if(len(selected_types) > 0):
@@ -99,7 +99,7 @@ def get_infrastructures(request):
         infrastructure_data = list(infrastructures.values())
 
         # Renvoyer la réponse JSON
-        print(infrastructure_data)
+        #print(infrastructure_data)
         return JsonResponse(infrastructure_data, safe=False)
     
     
