@@ -95,3 +95,20 @@ class Infrastructure(models.Model):
 
     def __str__(self):
         return self.nom 
+    
+    
+    
+class Guide(models.Model):
+    file = models.FileField(upload_to='uploads_files/', null=True, blank=True)
+    
+    
+    def __str__(self):
+        return f'{self.file}'
+    
+    @property
+    def fileURL(self):
+        try:
+            url = self.file.url
+        except:
+            url = ''
+        return url

@@ -60,10 +60,20 @@
                 <li class="nav-item ml-4 pl-4" id="admin">
                     <a class="nav-link" target="_blank" href="/admin"><i class="fa fa-gears"></i></a>
                 </li>
+                {% for guid in guide %}
+                
+                <li class="nav-item ml-4 pl-4" id="info">
+                    <a class="nav-link" target="_blank" href="{{guid.file.url}}"><i class="fa fa-info-circle bg-primary"></i></a>
+                </li>
+                {% empty %}
+                <li class="nav-item ml-4 pl-4" id="info">
+                    <a class="nav-link" href="">pas de guide fourni</a>
+                </li>
+                {% endfor %}
             </ul>
         </div>
         <div class="mx-auto order-0">
-            <a class="navbar-brand mr-4" href="#" style="color: #c1bf8c;">DIRECTION TECHNIQUE DE LA MAIRIE</a>
+            
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -91,9 +101,7 @@
               <li class="nav-item" role="presentation">
                 <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#emplacement" role="tab" aria-controls="profile" aria-selected="false">Emplacement</a>
               </li>
-              <li class="nav-item" role="presentation">
-                <a class="nav-link" id="contact-tab" data-bs-toggle="tab" href="#status" role="tab" aria-controls="contact" aria-selected="false">Status</a>
-              </li>
+              
             </ul>
         
             <div class="tab-content  mt-2" id="myTabContent">
@@ -128,6 +136,8 @@
                 <img id = "legend_image" src="">
             </div>
         </div>
+    </div>
+
 
         <!-- Jquery -->
         <script src="{% static "/js/jquery-3.7.0.min.js" %}"></script>
