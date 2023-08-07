@@ -1,0 +1,167 @@
+/*
+CSS to format webpages
+*/
+
+
+body {
+    padding-top: 50px; /* Required padding for .navbar-fixed-top. Remove if using .navbar-static-top. Change if height of navigation changes. */
+}
+
+table tr td{padding: 0}
+
+/* Header Image Background - Change the URL below to your image path (example: ../images/background.jpg) */
+
+.business-header {
+    height: 400px;
+    background: url('http://placehold.it/1920x400') center center no-repeat scroll;
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+}
+
+/* Customize the text color and shadow color and to optimize text legibility. */
+
+.tagline {
+    text-shadow: 0 0 10px #000;
+    color: #fff;
+}
+
+.img-center {
+    margin: 0 auto;
+}
+
+footer {
+    margin: 50px 0;
+}
+
+
+/*---------------------------------------*/
+/*Justify texte*/
+p{    
+    text-align: justify;
+}
+
+/*---------------------------------------*/
+/*Collapse navbar earlier
+  Collapse MenuBar when the screen is too small and too big
+*/
+@media (min-width: 580px) and (max-width: 991px) {
+    .navbar-collapse.collapse {
+        display: none !important;
+    }
+    .navbar-collapse.collapse.in {
+        display: block !important;
+    }
+    .navbar-header .collapse, .navbar-toggle {
+        display:block !important;
+    }
+    .navbar-header {
+        float:none;
+    }
+}
+
+/*---------------------------------------*/
+/*Floating Back to Top*/
+
+a.back-to-top {
+	display: none;
+	width: 60px;
+	height: 60px;
+	text-indent: -9999px;
+	position: fixed;
+	z-index: 999;
+	right: 20px;
+	bottom: 20px;
+        background: url("/BUMIGEB/images/controls/ima_RetourAuSommet.png") no-repeat center 43%;
+        opacity: 0.5;
+	/*background: #27AE61 url("/BUMIGEB/images/controls/ima_RetourAuSommet.png") no-repeat center 43%;
+	-webkit-border-radius: 30px;
+	-moz-border-radius: 30px;
+	border-radius: 30px;*/
+}
+
+
+/*---------------------------------------*/
+/*
+Add Offset because of the MenuBar
+Put this in destination location: class="anchor" 
+*/
+a.anchor {
+    display: block;
+    position: relative;
+    top: -50px;
+    visibility: hidden;
+}
+
+/*---------------------------------------*/
+/*Main page Title */
+.greeting h1 {
+  font-family: 'Raleway', sans-serif;
+  font-weight: lighter;
+  font-size: 40;
+  margin-top: 25px;
+  margin-bottom: 0px;
+}
+.greeting h2 {
+  font-family: 'Raleway', sans-serif;
+  font-weight: lighter;
+  font-size: 30;
+  margin-top: 0px;
+  margin-bottom: 25px;
+}
+
+/*---------------------------------------*/
+/*Carousel remove gradients */
+.carousel-control.left, .carousel-control.right {
+   background-image:none !important;
+   filter:none !important;
+}
+
+/*---------------------------------------*/
+/*Page Header Banner Text */
+.HeaderBanner{    
+    background-image: url("/BUMIGEB/images/controls/headerPage.jpg");
+    width:auto; 
+    height:auto;
+}
+.HeaderBannerText{
+    min-height: 112px        
+}
+
+.HeaderBannerText h1,
+.HeaderBannerText h2,
+.HeaderBannerText h3{
+   color: #fff;
+}
+/*---------------------------------------*/
+/*
+Actuality title color
+h1{font-size:36px} h2{font-size:30px} h3{font-size:24px} h4{font-size:20px} h5{font-size:18px} h6{font-size:16px} 
+*/
+
+.BigTitleBlue{
+    color: #337AB7;        
+    font-weight: bold;
+    font-size: 24px;
+
+}
+.BigTitleBlack{
+    color: #000000;        
+    font-weight: bold;
+    font-size: 24px;
+
+}
+
+/*---------------------------------------*/
+/*
+For mail button, Contact.html
+*/
+
+.btn-mail {
+    background-color: #FF3333;
+    border-style: none;
+    font-size: medium;
+    font-weight: bold;
+    color: white;
+}
