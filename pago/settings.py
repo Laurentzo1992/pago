@@ -77,7 +77,7 @@ DATABASES = {
         'NAME': 'pago',
         'USER': 'ubuntu',
         'PASSWORD': 'admin',
-        'HOST': 'localhost',
+        'HOST': '94.23.165.51',
         'PORT': '5432',
     }
 }
