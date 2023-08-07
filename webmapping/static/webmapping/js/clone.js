@@ -5,7 +5,8 @@ var ZOOM_1_200K = 10;
 var menu_width = 400; //Default menu width
 
 
-var selectedTypes = [];
+const selectedTypes = new Set();
+const selectedLocations = new Set();
 
 $(document).ready(function () {
 
@@ -76,11 +77,11 @@ $(document).ready(function () {
 
 
 
-    map.on('click', function (evt) {
-        vGetFeatureInfo(evt);
-    });
+    // map.on('click', function (evt) {
+    //     vGetFeatureInfo(evt);
+    // });
 
-    map.on('zoomend', vShowHideLayersToZoom);
+    // map.on('zoomend', vShowHideLayersToZoom);
 
 
 
@@ -112,6 +113,8 @@ function parseLocations(communes) {
         if ($(this).parent().hasClass('accordion-button')) {
             // event.stopPropagation();
             toggleChildren(this);
+        } else {
+            addToSelectedList(this);
         }
 
         if ($(this).data('parent')) {
@@ -126,10 +129,13 @@ function parseLocations(communes) {
 
         if (parent)
             updateParentCheckbox(parent);
-
+        
         // console.log('me');
         // if (this.id.startsWith('checkbox-type-')) {
         // }
+
+        // Mettre à jour la liste de Catégories selectionné
+        
     });
 }
 
@@ -198,7 +204,7 @@ function generateAccordionItem(item, level, parentId) {
         formCheck.className = "form-check";
 
         const checkbox = document.createElement("input");
-        checkbox.className = "form-check-input";
+        checkbox.className = "form-check-input last-level-type";
         checkbox.type = "checkbox";
         checkbox.id = `checkbox-type-${item.id}`;
         checkbox.setAttribute("data-parent", `checkbox-type-${parentId}`);
@@ -468,7 +474,7 @@ function generateQuartierAccordion(quartier, secteur) {
     formCheck.className = "form-check";
 
     const checkbox = document.createElement("input");
-    checkbox.className = "form-check-input";
+    checkbox.className = "form-check-input  quartier";
     checkbox.type = "checkbox";
     checkbox.id = `checkbox-quartier-${quartier.id}`;
     checkbox.setAttribute('data-secteur', 'checkbox-secteur-' + secteur.id);
@@ -528,14 +534,39 @@ function toggleChildren(parentCheckbox) {
         var typeId = this.id.replace('checkbox-type-', '');
 
         // Mettre à jour la liste des types sélectionnés
-        var index = selectedTypes.indexOf(typeId);
-        if (isChecked && index === -1) {
-            selectedTypes.push(typeId);
-        } else if (!isChecked && index !== -1) {
-            selectedTypes.splice(index, 1);
-        }
+        // var index = selectedTypes.indexOf(typeId);
+        // if (isChecked && index === -1) {
+        //     selectedTypes.push(typeId);
+        // } else if (!isChecked && index !== -1) {
+        //     selectedTypes.splice(index, 1);
+        // }
+        addToSelectedList(this);
     });
     // getInfrastructures();
+}
+
+function addToSelectedList(element) {
+    if ($(element).hasClass('last-level-type')) {
+        // Récupérer l'ID du type (extrait de l'attribut ID)
+        var tId = parseInt(element.id.replace('checkbox-type-', ''));
+        selectedTypes.add(tId);
+        if (element.checked) {
+            selectedTypes.add(tId);
+        } else {
+            selectedTypes.delete(tId);
+        }
+    } else if ($(element).hasClass('quartier')) {
+        // Récupérer l'ID du type (extrait de l'attribut ID)
+        var mId = parseInt(element.id.replace('checkbox-quartier-', ''));
+        selectedLocations.add(mId);
+        if (element.checked) {
+            selectedLocations.add(mId);
+        } else {
+            selectedLocations.delete(mId);
+        }
+    }
+    // console.log(selectedTypes);
+    // console.log(selectedLocations);
 }
 
 function updateParentCheckbox(parentId) {
@@ -588,12 +619,12 @@ function updateParentCheckbox(parentId) {
         } else if (checkedCount === totalCount) {
             parentCheckbox.prop("indeterminate", false);
             parentCheckbox.prop("checked", true);
-            
+
         } else {
             parentCheckbox.prop("indeterminate", true);
             parentCheckbox.prop("checked", false);
-            
-            
+
+
             classes = 'bg-danger border-danger';
         }
         parentCheckbox.addClass(classes);
@@ -610,6 +641,13 @@ function updateParentCheckbox(parentId) {
             parentId = undefined;
         }
     }
+}
+
+function toggleLeftPane() {
+    $('#slide_menu').toggleClass('slide_menu_visible');
+    $('#slide_button').toggleClass('slide_button_visible');
+    $('#legend').toggleClass('legend_visible');
+    $('#slide_button .fas').toggleClass('fa-rotate-180');
 }
 
 
