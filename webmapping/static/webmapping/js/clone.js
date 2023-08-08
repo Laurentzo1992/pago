@@ -659,6 +659,10 @@ function updateParentCheckbox(parentId) {
 }
 
 function toggleLeftPane() {
+    if (window.mobileAndTabletcheck()) {
+        menu_width = 250; //Reduce menu width for portable devices
+        $("#slide_menu").css('width', '250px');
+    }
     $('#slide_menu').toggleClass('slide_menu_visible');
     $('#slide_button').toggleClass('slide_button_visible');
     $('#legend').toggleClass('legend_visible');
