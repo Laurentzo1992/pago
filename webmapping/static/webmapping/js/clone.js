@@ -131,6 +131,7 @@ function parseLocations(communes) {
         } else {
             addToSelectedList(this);
         }
+        console.log(selectedTypes);
 
         if ($(this).data('parent')) {
             parent = $(this).data('parent');
