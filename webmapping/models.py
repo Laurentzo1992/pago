@@ -41,13 +41,14 @@ class Quartier(models.Model):
 
     def __str__(self):
         return self.nom_quartier
-    
+
+
     
 class Type(MPTTModel):
     type = models.CharField(max_length=200, null=True, blank=True, verbose_name="Type Infrastructure")
     parent = TreeForeignKey('self', on_delete=models.CASCADE, null=True, blank=True, related_name='children')
     search_fields = ['name']
-    
+
     class MPTTMeta:
         order_insertion_by = ['type']
     
@@ -56,8 +57,7 @@ class Type(MPTTModel):
     
     def __str__(self):
         return self.type
-    
-    
+
 class Status(models.Model):
     status = models.CharField(max_length=30, null=True, blank=True, verbose_name="Status Infrastructure")
     
@@ -112,3 +112,18 @@ class Guide(models.Model):
         except:
             url = ''
         return url
+
+class Legend(models.Model):
+    type = models.OneToOneField(Type, on_delete=models.CASCADE)
+    description = models.TextField()
+    image = models.ImageField(upload_to='legend_images/', help_text='La taille de l''image ne doit pas depassé 32x32 pixels.')
+
+    def get_image(self, obj):
+        return format_html('<img src="{}" style="max-width: 100px; max-height: 100px;" />', obj.image)
+
+    class Meta:
+        verbose_name = "Legende"
+        verbose_name_plural = "Legende"
+    
+    def __str__(self):
+        return self.type.type

@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from webmapping.models import *
 from django.core.serializers import serialize
 import json
+from django.core.paginator import Paginator
 
 
 
@@ -27,15 +28,21 @@ def get_types(request):
     root_types = Type.objects.filter(parent__isnull=True)
 
     def build_tree(type):
+        legend = Legend.objects.filter(type=type).first()
+        if legend:
+            legend_data = {'description': legend.description, 'image': legend.image.url}
+        else:
+            legend_data = None
+
         return {
             'id': type.id,
             'level': type.level,
             'name': type.type,
+            'legend': legend_data,  # Include legends data for the type
             'children': [build_tree(child) for child in type.children.all()]
         }
 
     data = [build_tree(category) for category in root_types]
-
 
     return JsonResponse(data, safe=False, content_type='application/json')
 
@@ -84,10 +91,12 @@ def get_locations(request):
     #print(communes)
     return JsonResponse(json_data, safe=False)
 
-def get_infrastructures(request):
+""" def get_infrastructures(request):
     if request.method == 'GET':
         selected_types = request.GET.getlist('selected_types[]')
         #print(selected_types)
+
+        selected_quariters = request.GET.getlist('selected_locations[]')
 
         # Récupérez les infrastructures liées aux catégories sélectionnées
         if(len(selected_types) > 0):
@@ -100,7 +109,67 @@ def get_infrastructures(request):
 
         # Renvoyer la réponse JSON
         #print(infrastructure_data)
-        return JsonResponse(infrastructure_data, safe=False)
+        return JsonResponse(infrastructure_data, safe=False) """
+
+def get_infrastructures(request):
+    data = json.loads(request.body.decode('utf-8'))
+
+    selected_types = data.get('selected_types', [])
+    selected_quarters = data.get('selected_quarters', [])
+
+    # Check if both selected_types and selected_quarters are empty
+    if not selected_types and not selected_quarters:
+        # Return an empty JSON response
+        return JsonResponse([], safe=False)
+
+    # Query infrastructures based on selected types
+    if selected_types:
+        infrastructures = Infrastructure.objects.filter(type__in=selected_types)
+    else:
+        infrastructures = Infrastructure.objects.all()
+
+    # If selected_quarters contains values, filter by quarters
+    if selected_quarters:
+        infrastructures = infrastructures.filter(quartier__in=selected_quarters)
+
+    # Serialize infrastructures to JSON
+    infrastructure_data = list(infrastructures.values())
+
+    # Return JSON response
+    return JsonResponse(infrastructure_data, safe=False)
+
+
+def get_paginated_infrastructures(request):
+    data = json.loads(request.body.decode('utf-8'))
+
+    selected_types = data.get('selected_types', [])
+    selected_quarters = data.get('selected_quarters', [])
+
+    # Query infrastructures based on selected types
+    if selected_types:
+        infrastructures = Infrastructure.objects.filter(type__in=selected_types)
+    else:
+        infrastructures = Infrastructure.objects.all()
+
+    # If selected_quarters contains values, filter by quarters
+    if selected_quarters:
+        infrastructures = infrastructures.filter(quartier__in=selected_quarters)
+
+    # Paginate the data
+    paginator = Paginator(infrastructures, 10)  # Change '10' to the desired number of items per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    # Serialize paginated data to JSON
+    infrastructure_data = list(page_obj.object_list.values())
+
+    # Return JSON response with pagination details
+    return JsonResponse({
+        'data': infrastructure_data,
+        'total_items': paginator.count,
+        'page': page_obj.number,
+        'pages': paginator.num_pages,
+    })
     
     
     

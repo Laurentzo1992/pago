@@ -12,6 +12,7 @@
     <title> {% block title %}PAGO {% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="icon" href="{% static "/media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/client.jpg" %}"> -->
@@ -26,7 +27,7 @@
     <link href="{% static "/css/datatables.min.css" %}" rel="stylesheet">
     <!-- Leaflet -->
     <link href="{% static "/leaflet/leaflet.css" %}" rel="stylesheet">
-    <link href="{% static "/css/Chart.min.css" %}" rel="stylesheet">
+    <!-- <link href="{% static "/css/Chart.min.css" %}" rel="stylesheet"> -->
     <!-- Custom -->
     {% comment %}
     <link rel="stylesheet" href="{% static "/webmapping/style.css" %}" />{% endcomment %}
@@ -34,12 +35,13 @@
         Custom cloned
      -->
     <!-- format page -->
-    <link href="{% static "/webmapping/css/format-page.css" %}" rel="stylesheet">
+    <!-- <link href="{% static "/webmapping/css/format-page.css" %}" rel="stylesheet"> -->
     <!-- For SubMenu -->
     <link href="{% static "/webmapping/css/submenu.css" %}" rel="stylesheet">
     <!-- zoom in image-->
     <link href="{% static "/webmapping/css/zoom-in-image.css" %}" rel="stylesheet">
     <link href="{% static "/webmapping/css/L.Control.ZoomBox.css" %}" rel="stylesheet" />
+    <link href="{% static "/webmapping/css/jquery.dataTables.min.css" %}" rel="stylesheet" />
     <!-- Custom css cloned -->
     <link href="{% static "/webmapping/css/clone.css" %}" rel="stylesheet" />
 
@@ -101,7 +103,9 @@
               <li class="nav-item" role="presentation">
                 <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#emplacement" role="tab" aria-controls="profile" aria-selected="false">Emplacement</a>
               </li>
-              
+              <li class="nav-item" role="presentation">
+                <a class="nav-link" id="result-tab" data-bs-toggle="tab" href="#result" role="tab" aria-controls="result" aria-selected="false">Resultat</a>
+              </li>
             </ul>
         
             <div class="tab-content  mt-2" id="myTabContent">
@@ -115,8 +119,10 @@
 
                 </div>
               </div>
-              <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                <p>Comming soon...</p>
+              <div class="tab-pane fade" id="result" role="tabpanel" aria-labelledby="contact-tab">
+                <table id="infrastructures-table" class="display" style="width:100%">
+                    <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
@@ -141,23 +147,28 @@
 
         <!-- Jquery -->
         <script src="{% static "/js/jquery-3.7.0.min.js" %}"></script>
+        <script src="{% static "/webmapping/js/jquery.dataTables.min.js" %}"></script>
         <!-- Bootstrap -->
         <script src="{% static "/js/popper.min.js" %}"></script>
         <script src="{% static "/js/bootstrap.min.js" %}"></script>
         <!-- Leaflet -->
         <script src="{% static "/leaflet/leaflet.js" %}"></script>
+        <!-- RBush: Leaflet Canvas Markers dependancy -->
+        <script src="{% static "/leaflet/rbush.min.js" %}"></script>
+        <!-- Leaflet Canvas Markers -->
+        <script src="{% static "/leaflet/leaflet-markers-canvas.js" %}"></script>
+        <!-- Leaflet Canvas Icon -->
+        <script src="{% static "/leaflet/leaflet-canvasicon.js" %}"></script>
         <!-- Leaflet ZoomBox -->
         <script src="{% static "/leaflet/L.Control.ZoomBox.min.js" %}"></script>
-        <!-- Pdfmake -->
-        <script src="{% static "/js/pdfmake.min.js" %}"></script>
         <!-- vfs_fonts -->
-        <script src="{% static "/js/vfs_fonts.js" %}"></script>
+        <!-- <script src="{% static "/js/vfs_fonts.js" %}"></script> -->
         <!-- Datatables -->
-        <script src="{% static "/js/datatables.min.js" %}"></script>
+        <!-- <script src="{% static "/js/datatables.min.js" %}"></script> -->
         <!-- Chart js  -->
-        <script src="{% static "/js/html2canvas.min.js" %}"></script>
-        <script src="{% static "/js/chart.js" %}"></script>
-        <script src="{% static "/js/Chart.min.js" %}"></script>
+        <!-- <script src="{% static "/js/html2canvas.min.js" %}"></script> -->
+        <!-- <script src="{% static "/js/chart.js" %}"></script> -->
+        <!-- <script src="{% static "/js/Chart.min.js" %}"></script> -->
         <!-- Custom Js -->
         {% comment %}
         <script src="{% static "/webmapping/script.js" %}"></script>{% endcomment %}
