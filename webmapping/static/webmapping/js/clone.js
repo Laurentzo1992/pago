@@ -242,7 +242,7 @@ function updateMap(data) {
         var numericId = parseInt(id.split('-')[1]);
         var marker  = markers.get(numericId);
         marker.openPopup();
-        map.setView(marker.getLatLng(), 12);
+        map.setView(marker.getLatLng(), 15);
         // map.on('moveend', function () {
         //     marker.openPopup();
         // });
