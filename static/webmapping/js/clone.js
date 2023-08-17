@@ -570,7 +570,16 @@ function generateSecteurAccordion(secteur, arrondissement) {
 
         const accordionCollapse = document.createElement("div");
         accordionCollapse.id = `collapse-secteur-${secteur.id}`;
-        accordionCollapse.className = "accordion-collapse collapse";
+
+        var collapseClassName = "accordion-collapse collapse";
+        if (currentParsingCommune.trim().toLowerCase() == "ouagadougou") {
+            collapseClassName += " d-none";
+            $(formCheck).addClass("notoggle");
+        }
+        accordionCollapse.className = collapseClassName;
+        
+
+        // accordionCollapse.className = "accordion-collapse collapse";
         
         accordionCollapse.setAttribute("aria-labelledby", `heading-secteur-${secteur.id}`);
 
