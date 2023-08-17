@@ -405,3 +405,11 @@ input[type=range]:focus::-ms-fill-upper {
     max-height: 350px;
     overflow: auto;
 }
+
+.dataTables_wrapper .dataTables_paginate .paginate_butto {
+    padding: none !important;
+}
+
+div.dataTables_wrapper div.dataTables_paginate {
+    white-space: none !important;
+}

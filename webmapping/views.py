@@ -4,6 +4,7 @@ from webmapping.models import *
 from django.core.serializers import serialize
 import json
 from django.core.paginator import Paginator
+from django.core import serializers
 
 
 
@@ -20,7 +21,9 @@ def clone(request):
     #results = Infrastructure.objects.all() 
     #results_json = json.dumps(list(results.values()))
     guide = Guide.objects.all()
-    context = {"guide":guide}
+    statuses = Status.objects.all()
+    context = {"guide":guide, 'statuses': statuses}
+
     return render(request, 'webmapping/clone.html', context)    
 
 
@@ -91,6 +94,17 @@ def get_locations(request):
     #print(communes)
     return JsonResponse(json_data, safe=False)
 
+def get_statuses(request):
+     # Get all Status objects
+    statuses = Status.objects.all()
+    
+    # Extract "status" field values
+    status_data = [{"status": status.status, "id": status.id} for status in statuses]
+    
+    # Return a JsonResponse with the customized data
+    return JsonResponse(status_data, safe=False)
+
+
 """ def get_infrastructures(request):
     if request.method == 'GET':
         selected_types = request.GET.getlist('selected_types[]')
@@ -116,9 +130,10 @@ def get_infrastructures(request):
 
     selected_types = data.get('selected_types', [])
     selected_quarters = data.get('selected_quarters', [])
+    selected_statuses = data.get('selected_statuses', [])
 
     # Check if both selected_types and selected_quarters are empty
-    if not selected_types and not selected_quarters:
+    if not selected_types:
         # Return an empty JSON response
         return JsonResponse([], safe=False)
 
@@ -128,6 +143,10 @@ def get_infrastructures(request):
     else:
         infrastructures = Infrastructure.objects.all()
 
+    # If selected_statuses contains values, filter by statues
+    if selected_statuses:
+        infrastructures = infrastructures.filter(status__in=selected_statuses)
+    
     # If selected_quarters contains values, filter by quarters
     if selected_quarters:
         infrastructures = infrastructures.filter(quartier__in=selected_quarters)

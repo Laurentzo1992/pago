@@ -7,11 +7,13 @@ var menu_width = 400; //Default menu width
 
 const selectedTypes = new Set();
 const selectedQuarters = new Set();
+const selectedStatuses = new Map();
 
 
 // Convert sets to arrays
 var selectedTypesArray;
 var selectedQuartersArray;
+var selectedStatusesArray;
 
 var selectedInfrastructures = [];
 
@@ -21,6 +23,8 @@ var infrastructuresDataTable;
 
 var icons = new Map();
 var markers = new Map();
+
+var currentParsingCommune;
 
 var defaultIcon = L.icon({
     iconUrl: "static/webmapping/img/rectangle-red.png",
@@ -159,6 +163,18 @@ function parseLocations(communes) {
         $(this).removeAttr("style");
 
         event.stopImmediatePropagation();
+
+        if ($(this).hasClass('checkbox-status')) {
+            var numId = parseInt(this.id.split('-')[2]);
+            if(!this.checked) {
+                selectedStatuses.delete(numId);
+            } else {
+                var labelText = this.nextElementSibling.textContent;
+                selectedStatuses.set(numId, labelText);
+            }
+            fetchDataAndUpdateMap();
+            return;
+        }
         // toggleChildren(this);
         if ($(this).parent().hasClass('accordion-button')) {
             // event.stopPropagation();
@@ -191,7 +207,8 @@ function fetchDataAndUpdateMap() {
     
     var requestData = {
         selected_types: Array.from(selectedTypes),
-        selected_quarters: Array.from(selectedQuarters)
+        selected_quarters: Array.from(selectedQuarters),
+        selected_statuses: Array.from(selectedStatuses.keys()),
     };
 
     const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
@@ -242,7 +259,7 @@ function updateMap(data) {
         var numericId = parseInt(id.split('-')[1]);
         var marker  = markers.get(numericId);
         marker.openPopup();
-        map.setView(marker.getLatLng(), 12);
+        map.setView(marker.getLatLng(), 15);
         // map.on('moveend', function () {
         //     marker.openPopup();
         // });
@@ -352,6 +369,7 @@ function generateAccordionItem(item, level, parentId) {
 }
 
 function generateCommuneAccordion(commune) {
+    currentParsingCommune = commune.name;
     if (commune.arrondissements.length > 0) {
         const accordionItem = document.createElement("div");
         accordionItem.className = "accordion-item";
@@ -439,7 +457,7 @@ function generateArrondissementAccordion(arrondissement, commune) {
         heading.id = `heading-arrondissement-${arrondissement.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button collapsed";
+        formCheck.className = "form-check accordion-button collapsed nottogle";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-arrondissement-${arrondissement.id}`;
 
@@ -464,7 +482,14 @@ function generateArrondissementAccordion(arrondissement, commune) {
 
         const accordionCollapse = document.createElement("div");
         accordionCollapse.id = `collapse-arrondissement-${arrondissement.id}`;
-        accordionCollapse.className = "accordion-collapse collapse";
+        
+        var collapseClassName = "accordion-collapse collapse";
+        if (currentParsingCommune.trim().toLowerCase() != "ouagadougou") {
+            collapseClassName += " d-none";
+            $(formCheck).addClass("notoggle");
+        }
+        accordionCollapse.className = collapseClassName;
+        
         accordionCollapse.setAttribute("aria-labelledby", `heading-arrondissement-${arrondissement.id}`);
 
         const accordionBody = document.createElement("div");
@@ -546,6 +571,7 @@ function generateSecteurAccordion(secteur, arrondissement) {
         const accordionCollapse = document.createElement("div");
         accordionCollapse.id = `collapse-secteur-${secteur.id}`;
         accordionCollapse.className = "accordion-collapse collapse";
+        
         accordionCollapse.setAttribute("aria-labelledby", `heading-secteur-${secteur.id}`);
 
         const accordionBody = document.createElement("div");
@@ -595,7 +621,6 @@ function generateQuartierAccordion(quartier, secteur) {
 
     const accordionBody = document.createElement("div");
     accordionBody.className = "accordion-body";
-
     const formCheck = document.createElement("div");
     formCheck.className = "form-check";
 
