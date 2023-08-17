@@ -6,15 +6,60 @@ var menu_width = 400; //Default menu width
 
 
 const selectedTypes = new Set();
-const selectedLocations = new Set();
+const selectedQuarters = new Set();
+const selectedStatuses = new Map();
+
+
+// Convert sets to arrays
+var selectedTypesArray;
+var selectedQuartersArray;
+var selectedStatusesArray;
+
+var selectedInfrastructures = [];
+
+var pointLayer;
+var markersCanvas;
+var infrastructuresDataTable;
+
+var icons = new Map();
+var markers = new Map();
+
+var currentParsingCommune;
+
+var defaultIcon = L.icon({
+    iconUrl: "static/webmapping/img/rectangle-red.png",
+    iconSize: [4, 4],
+    iconAnchor: [2, 0],
+});
+
+var icon = defaultIcon;
+
 
 $(document).ready(function () {
+    infrastructuresDataTable = new DataTable(
+        '#infrastructures-table',
+        {
+        language: {
+            url: '/static/webmapping/js/fr-FR.json'
+        },
+        data: [],
+        paging: true,
+        columns: [
+            { data: 'nom' },  // Replace with the appropriate column names
+        ],
+        createdRow: function(row, data, dataIndex) {
+            $(row).attr('id', 'result-' + data.id);
+        }
+    });
 
     if (window.mobileAndTabletcheck()) {
         menu_width = 250; //Reduce menu width for portable devices
         $("#slide_menu").css('width', '250px');
     }
-    map = new L.map('map', {maxZoom: 18, zoomControl: false});
+    map = (new L.map('map', { maxZoom: 18, zoomControl: false }));
+
+
+
     //tileLayer: {maxNativeZoom: 19}
 
     map.setView([12.3569, -1.5352], 10); //Coordinates and zoom level
@@ -25,9 +70,15 @@ $(document).ready(function () {
         , attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     });
 
-    new L.Control.Zoom({ position: 'topright' }).addTo(map);
+    (new L.Control.Zoom({ position: 'topright' })).addTo(map);
 
     map.addLayer(osm);
+
+    // pointLayer = L.layerGroup();
+    // pointLayer.addTo(map);
+    markersCanvas = new L.MarkersCanvas();
+    markersCanvas.addTo(map);
+
 
     //Scale control
 
@@ -73,18 +124,6 @@ $(document).ready(function () {
                 .fail(function () {
                     alert("Impossible de joindre le serveur");
                 });
-                ///////////////////////////////////////////////////////
-
-                // infrastructure data and locate
-
-                ///////////////////////////////////////////////////////
-                
-                $.get("/api/infrastructures")
-                .done(parseLocations)
-                .fail(function () {
-                    alert("Le Géoportail n'est pas disponible présentemment. Veuillez SVP réessayer plus tard.");
-                });
-            ////////////////////////////////////////////////////////////////
         })
         .fail(function () {
             alert("Impossible de joindre le serveur");
@@ -124,6 +163,18 @@ function parseLocations(communes) {
         $(this).removeAttr("style");
 
         event.stopImmediatePropagation();
+
+        if ($(this).hasClass('checkbox-status')) {
+            var numId = parseInt(this.id.split('-')[2]);
+            if(!this.checked) {
+                selectedStatuses.delete(numId);
+            } else {
+                var labelText = this.nextElementSibling.textContent;
+                selectedStatuses.set(numId, labelText);
+            }
+            fetchDataAndUpdateMap();
+            return;
+        }
         // toggleChildren(this);
         if ($(this).parent().hasClass('accordion-button')) {
             // event.stopPropagation();
@@ -131,7 +182,6 @@ function parseLocations(communes) {
         } else {
             addToSelectedList(this);
         }
-        console.log(selectedTypes);
 
         if ($(this).data('parent')) {
             parent = $(this).data('parent');
@@ -140,19 +190,81 @@ function parseLocations(communes) {
         } else if ($(this).data('arrondissement')) {
             parent = $(this).data('arrondissement');
         } else if ($(this).data('secteur')) {
-            parent = $(this).data('secteur')
+            parent = $(this).data('secteur');
         }
 
         if (parent)
             updateParentCheckbox(parent);
-        
-        // console.log('me');
-        // if (this.id.startsWith('checkbox-type-')) {
-        // }
 
-        // Mettre à jour la liste de Catégories selectionné
+
+        fetchDataAndUpdateMap();
+    });
+
+    
+}
+
+function fetchDataAndUpdateMap() {
+    
+    var requestData = {
+        selected_types: Array.from(selectedTypes),
+        selected_quarters: Array.from(selectedQuarters),
+        selected_statuses: Array.from(selectedStatuses.keys()),
+    };
+
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    // Make an AJAX request to fetch data
+    $.ajax({
+        url: "/api/infrastructures/",
+        type: "POST",
+        contentType: "application/json",
+        data: JSON.stringify(requestData),
+        headers: {
+            "X-CSRFToken": csrfToken
+        },
+        success: function (response) {
+            // Clear existing data and add fetched data to DataTable
+            infrastructuresDataTable.clear().rows.add(response).draw();
+            updateMap(response);
+            selectedInfrastructures = response;
+        },
+        error: function (error) {
+            console.error('Error fetching data:', error);
+        }
+    });
+}
+
+function updateMap(data) {
+    markers.clear();
+    data.forEach(infra => {
+        var popupContent = '<b>' + infra.nom + '</b><br>' +
+            '<b>Emplacement: </b>' + infra.emplacement + '<br>';
+
+        // var marker = L.marker([infra.latitude, infra.longitude], { icon: triangleIcon });
+        const marker = L.marker([infra.latitude, infra.longitude], { icon: icons.get(infra.type_id) });
+        marker.bindPopup(popupContent)
+            .on({
+                mouseclick(e) {
+                    this.openPopup();
+                },
+            });
+        markers.set(infra.id, marker);
         
     });
+    
+    markersCanvas.clear();
+    markersCanvas.addMarkers(Array.from(markers.values()));
+    $(document).on('click', '#infrastructures-table tr', function (e) {
+        var id = $(this).attr('id');
+        var numericId = parseInt(id.split('-')[1]);
+        var marker  = markers.get(numericId);
+        marker.openPopup();
+        map.setView(marker.getLatLng(), 15);
+        // map.on('moveend', function () {
+        //     marker.openPopup();
+        // });
+    })
+    
 }
 
 
@@ -160,6 +272,22 @@ function parseLocations(communes) {
 
 // Helper function to generate accordion items
 function generateAccordionItem(item, level, parentId) {
+    if (item.legend === null) {
+        if (level == 0) {
+            icons.set(item.id, defaultIcon);
+        } else {
+            icons.set(item.id, icons.get(parentId));
+        }
+    } else {
+        icons.set(
+            item.id,
+            L.icon({
+                iconUrl: item.legend.image,
+                iconSize: [10, 10],
+                iconAnchor: [5, 0],
+            })
+        );
+    }
 
     if (item.children.length > 0) {
         const accordionItem = document.createElement("div");
@@ -241,7 +369,7 @@ function generateAccordionItem(item, level, parentId) {
 }
 
 function generateCommuneAccordion(commune) {
-
+    currentParsingCommune = commune.name;
     if (commune.arrondissements.length > 0) {
         const accordionItem = document.createElement("div");
         accordionItem.className = "accordion-item";
@@ -329,7 +457,7 @@ function generateArrondissementAccordion(arrondissement, commune) {
         heading.id = `heading-arrondissement-${arrondissement.id}`;
 
         const formCheck = document.createElement("div");
-        formCheck.className = "form-check accordion-button collapsed";
+        formCheck.className = "form-check accordion-button collapsed nottogle";
         formCheck.dataset.bsToggle = "collapse";
         formCheck.dataset.bsTarget = `#collapse-arrondissement-${arrondissement.id}`;
 
@@ -354,7 +482,14 @@ function generateArrondissementAccordion(arrondissement, commune) {
 
         const accordionCollapse = document.createElement("div");
         accordionCollapse.id = `collapse-arrondissement-${arrondissement.id}`;
-        accordionCollapse.className = "accordion-collapse collapse";
+        
+        var collapseClassName = "accordion-collapse collapse";
+        if (currentParsingCommune.trim().toLowerCase() != "ouagadougou") {
+            collapseClassName += " d-none";
+            $(formCheck).addClass("notoggle");
+        }
+        accordionCollapse.className = collapseClassName;
+        
         accordionCollapse.setAttribute("aria-labelledby", `heading-arrondissement-${arrondissement.id}`);
 
         const accordionBody = document.createElement("div");
@@ -436,6 +571,7 @@ function generateSecteurAccordion(secteur, arrondissement) {
         const accordionCollapse = document.createElement("div");
         accordionCollapse.id = `collapse-secteur-${secteur.id}`;
         accordionCollapse.className = "accordion-collapse collapse";
+        
         accordionCollapse.setAttribute("aria-labelledby", `heading-secteur-${secteur.id}`);
 
         const accordionBody = document.createElement("div");
@@ -485,7 +621,6 @@ function generateQuartierAccordion(quartier, secteur) {
 
     const accordionBody = document.createElement("div");
     accordionBody.className = "accordion-body";
-
     const formCheck = document.createElement("div");
     formCheck.className = "form-check";
 
@@ -562,27 +697,28 @@ function toggleChildren(parentCheckbox) {
 }
 
 function addToSelectedList(element) {
-    if ($(element).hasClass('last-level-type')) {
-        // Récupérer l'ID du type (extrait de l'attribut ID)
-        var tId = parseInt(element.id.replace('checkbox-type-', ''));
-        selectedTypes.add(tId);
-        if (element.checked) {
+    if ($(element).has)
+        if ($(element).hasClass('last-level-type')) {
+            // Récupérer l'ID du type (extrait de l'attribut ID)
+            var tId = parseInt(element.id.replace('checkbox-type-', ''));
             selectedTypes.add(tId);
-        } else {
-            selectedTypes.delete(tId);
+            if (element.checked) {
+                selectedTypes.add(tId);
+            } else {
+                selectedTypes.delete(tId);
+            }
+        } else if ($(element).hasClass('quartier')) {
+            // Récupérer l'ID du type (extrait de l'attribut ID)
+            var mId = parseInt(element.id.replace('checkbox-quartier-', ''));
+            selectedQuarters.add(mId);
+            if (element.checked) {
+                selectedQuarters.add(mId);
+            } else {
+                selectedQuarters.delete(mId);
+            }
         }
-    } else if ($(element).hasClass('quartier')) {
-        // Récupérer l'ID du type (extrait de l'attribut ID)
-        var mId = parseInt(element.id.replace('checkbox-quartier-', ''));
-        selectedLocations.add(mId);
-        if (element.checked) {
-            selectedLocations.add(mId);
-        } else {
-            selectedLocations.delete(mId);
-        }
-    }
     // console.log(selectedTypes);
-    // console.log(selectedLocations);
+    // console.log(selectedQuarters);
 }
 
 function updateParentCheckbox(parentId) {

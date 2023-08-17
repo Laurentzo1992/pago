@@ -4,7 +4,7 @@
 <html>
 
 <head>
-    <title>WebMapping - PAGO</title>
+    <title>Grand Ouaga Data</title>
 
     <!-- Included -->
     <meta charset="utf-8">
@@ -12,6 +12,7 @@
     <title> {% block title %}PAGO {% endblock %}</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token }}">
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="icon" href="{% static "/media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/client.jpg" %}"> -->
@@ -26,7 +27,7 @@
     <link href="{% static "/css/datatables.min.css" %}" rel="stylesheet">
     <!-- Leaflet -->
     <link href="{% static "/leaflet/leaflet.css" %}" rel="stylesheet">
-    <link href="{% static "/css/Chart.min.css" %}" rel="stylesheet">
+    <!-- <link href="{% static "/css/Chart.min.css" %}" rel="stylesheet"> -->
     <!-- Custom -->
     {% comment %}
     <link rel="stylesheet" href="{% static "/webmapping/style.css" %}" />{% endcomment %}
@@ -34,12 +35,13 @@
         Custom cloned
      -->
     <!-- format page -->
-    <link href="{% static "/webmapping/css/format-page.css" %}" rel="stylesheet">
+    <!-- <link href="{% static "/webmapping/css/format-page.css" %}" rel="stylesheet"> -->
     <!-- For SubMenu -->
     <link href="{% static "/webmapping/css/submenu.css" %}" rel="stylesheet">
     <!-- zoom in image-->
     <link href="{% static "/webmapping/css/zoom-in-image.css" %}" rel="stylesheet">
     <link href="{% static "/webmapping/css/L.Control.ZoomBox.css" %}" rel="stylesheet" />
+    <link href="{% static "/webmapping/css/jquery.dataTables.min.css" %}" rel="stylesheet" />
     <!-- Custom css cloned -->
     <link href="{% static "/webmapping/css/clone.css" %}" rel="stylesheet" />
 
@@ -63,7 +65,7 @@
                 {% for guid in guide %}
                 
                 <li class="nav-item ml-4 pl-4" id="info">
-                    <a class="nav-link" target="_blank" href="{{guid.file.url}}"><i class="fa fa-info-circle bg-primary"></i></a>
+                    <a class="nav-link" target="_blank" href="{{guid.file.url}}"><i class="fa fa-info-circle"></i></a>
                 </li>
                 {% empty %}
                 <li class="nav-item ml-4 pl-4" id="info">
@@ -73,22 +75,14 @@
             </ul>
         </div>
         <div class="mx-auto order-0">
-            
+            <a class="navbar-brand ml-auto" href="#" style="color: #c1bf8c;">GRAND OUAGA DATA</a>
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
                 <span class="navbar-toggler-icon"></span>
             </button>
         </div>
-        {% comment %} <div class="navbar-collapse justify-content-end align-items-center w-100 order-3 dual-collapse2">
-            <ul class="navbar-nav ml-auto">
-                <li class="nav-item">
-                    <a class="nav-link py-0" href="#">
-                        <div class="user-inline d-flex align-items-center">
-                            <span class="username ml-4 mr-4">{{request.user}}</span> <span class="avatar text-lg"><i class="fas fa-user-circle"></i></span>
-                        </div>
-                    </a>
-                </li>
-            </ul>
-        </div> {% endcomment %}
+         <div class="navbar-collapse justify-content-end align-items-center w-100 order-3 dual-collapse2">
+           
+        </div> 
     </nav>
 
     <div id='slide_menu'>
@@ -101,7 +95,12 @@
               <li class="nav-item" role="presentation">
                 <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#emplacement" role="tab" aria-controls="profile" aria-selected="false">Emplacement</a>
               </li>
-              
+              <li class="nav-item" role="presentation">
+                <a class="nav-link" id="status-tab" data-bs-toggle="tab" href="#status" role="tab" aria-controls="result" aria-selected="false">Status</a>
+              </li>
+              <li class="nav-item" role="presentation">
+                <a class="nav-link" id="result-tab" data-bs-toggle="tab" href="#result" role="tab" aria-controls="result" aria-selected="false">Resultat</a>
+              </li>
             </ul>
         
             <div class="tab-content  mt-2" id="myTabContent">
@@ -115,15 +114,25 @@
 
                 </div>
               </div>
-              <div class="tab-pane fade" id="contact" role="tabpanel" aria-labelledby="contact-tab">
-                <p>Comming soon...</p>
+              <div class="tab-pane fade" id="status" role="tabpanel" aria-labelledby="status-tab">
+                    {% for status in statuses %}
+                    <div class="form-check">
+                        <input class="form-check-input checkbox-status" type="checkbox" id="checkbox-status-{{status.id}}" autocomplete="off">
+                        <label class="form-check-label" for="checkbox-status-{{status.id}}">{{status.status}}</label>
+                    </div>
+                    {% endfor %}
+              </div>
+              <div class="tab-pane fade" id="result" role="tabpanel" aria-labelledby="contact-tab">
+                <table id="infrastructures-table" class="display" style="width:100%">
+                    <tbody></tbody>
+                </table>
               </div>
             </div>
           </div>
         
     </div>
     <div id='map'>
-        <div id="slide_button"  class="btn btn-danger d-flex align-items-center" type="button" onClick="toggleLeftPane(); event.stopPropagation();" value="">
+        <div id="slide_button"  class="btn btn-dark d-flex align-items-center" type="button" onClick="toggleLeftPane(); event.stopPropagation();" value="">
             <i class="fas fa-angle-double-right"></i>
         </div>
         <div id="legend" onmouseover="map.dragging.disable(); map.touchZoom.disable();map.doubleClickZoom.disable(); map.scrollWheelZoom.disable()" 
@@ -141,23 +150,28 @@
 
         <!-- Jquery -->
         <script src="{% static "/js/jquery-3.7.0.min.js" %}"></script>
+        <script src="{% static "/webmapping/js/jquery.dataTables.min.js" %}"></script>
         <!-- Bootstrap -->
         <script src="{% static "/js/popper.min.js" %}"></script>
         <script src="{% static "/js/bootstrap.min.js" %}"></script>
         <!-- Leaflet -->
         <script src="{% static "/leaflet/leaflet.js" %}"></script>
+        <!-- RBush: Leaflet Canvas Markers dependancy -->
+        <script src="{% static "/leaflet/rbush.min.js" %}"></script>
+        <!-- Leaflet Canvas Markers -->
+        <script src="{% static "/leaflet/leaflet-markers-canvas.js" %}"></script>
+        <!-- Leaflet Canvas Icon -->
+        <script src="{% static "/leaflet/leaflet-canvasicon.js" %}"></script>
         <!-- Leaflet ZoomBox -->
         <script src="{% static "/leaflet/L.Control.ZoomBox.min.js" %}"></script>
-        <!-- Pdfmake -->
-        <script src="{% static "/js/pdfmake.min.js" %}"></script>
         <!-- vfs_fonts -->
-        <script src="{% static "/js/vfs_fonts.js" %}"></script>
+        <!-- <script src="{% static "/js/vfs_fonts.js" %}"></script> -->
         <!-- Datatables -->
-        <script src="{% static "/js/datatables.min.js" %}"></script>
+        <!-- <script src="{% static "/js/datatables.min.js" %}"></script> -->
         <!-- Chart js  -->
-        <script src="{% static "/js/html2canvas.min.js" %}"></script>
-        <script src="{% static "/js/chart.js" %}"></script>
-        <script src="{% static "/js/Chart.min.js" %}"></script>
+        <!-- <script src="{% static "/js/html2canvas.min.js" %}"></script> -->
+        <!-- <script src="{% static "/js/chart.js" %}"></script> -->
+        <!-- <script src="{% static "/js/Chart.min.js" %}"></script> -->
         <!-- Custom Js -->
         {% comment %}
         <script src="{% static "/webmapping/script.js" %}"></script>{% endcomment %}
