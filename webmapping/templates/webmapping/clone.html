@@ -13,6 +13,10 @@
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token }}">
+    <link rel="shortcut icon" href="{% static "/images/app_img/favicon.ico" %}" type="image/x-icon">
+		<link rel="icon" href="{% static "/media/app_img/favicon.ico" %}" type="image/x-icon">
+    <link rel="shortcut icon" href={% static "/images/app_img/pago.jpeg" %}>
+        
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="icon" href="{% static "/media/app_img/favicon.ico" %}" type="image/x-icon"> -->
     <!-- <link rel="shortcut icon" href="{% static " /media/app_img/client.jpg" %}"> -->
@@ -76,10 +80,13 @@
         </div>
         <div class="mx-auto order-0">
             <a class="navbar-brand ml-auto" href="#" style="color: #c1bf8c;">GRAND OUAGA DATA</a>
+          
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".dual-collapse2">
                 <span class="navbar-toggler-icon"></span>
             </button>
+            
         </div>
+        <img src="{% static 'media/app_img/pago.jpeg' %}" class="img-fluid float-end" alt="Logo pago" style="width:8%;">
          <div class="navbar-collapse justify-content-end align-items-center w-100 order-3 dual-collapse2">
            
         </div> 
@@ -96,7 +103,7 @@
                 <a class="nav-link" id="profile-tab" data-bs-toggle="tab" href="#emplacement" role="tab" aria-controls="profile" aria-selected="false">Emplacement</a>
               </li>
               <li class="nav-item" role="presentation">
-                <a class="nav-link" id="status-tab" data-bs-toggle="tab" href="#status" role="tab" aria-controls="result" aria-selected="false">Status</a>
+                <a class="nav-link" id="status-tab" data-bs-toggle="tab" href="#status" role="tab" aria-controls="result" aria-selected="false">Statut</a>
               </li>
               <li class="nav-item" role="presentation">
                 <a class="nav-link" id="result-tab" data-bs-toggle="tab" href="#result" role="tab" aria-controls="result" aria-selected="false">Rechercher</a>
