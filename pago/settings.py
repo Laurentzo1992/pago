@@ -77,7 +77,7 @@ DATABASES = {
         'NAME': 'pago',
         'USER': 'ubuntu',
         'PASSWORD': 'pago@2023',
-        'HOST': '94.23.165.51',
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
@@ -150,7 +150,7 @@ STATICFILES_DIRS = [
 ]
 
 MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, "pago/static/media")
+MEDIA_ROOT = os.path.join(BASE_DIR, "/static/media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
