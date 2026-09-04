@@ -1,0 +1,42 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+#map-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+/* The original stylesheet never actually flips #legend's display back on
+   (`.legend_visible` only sets margin-left) - fixed here so the legend panel
+   is shown whenever it is mounted (see LegendPanel.tsx). */
+#legend {
+  display: block;
+}
+
+#slide_button {
+  top: 0;
+  left: 0px;
+  transition: left 0.5s;
+}
+
+#slide_button.slide_button_visible {
+  left: 400px;
+}
+
+.nav-link.btn.btn-link {
+  text-decoration: none;
+  border: none;
+}
