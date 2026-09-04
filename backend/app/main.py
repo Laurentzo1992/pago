@@ -4,7 +4,7 @@ from fastapi.staticfiles import StaticFiles
 from starlette.middleware.sessions import SessionMiddleware
 
 from app.admin import register_admin
-from app.config import settings
+from app.config import BASE_DIR, settings
 from app.database import engine
 from app.routers import guides, infrastructures, locations, status, types
 
@@ -20,6 +20,7 @@ app.add_middleware(
 )
 
 app.mount(settings.media_url, StaticFiles(directory=settings.media_root), name="media")
+app.mount("/admin-static", StaticFiles(directory=BASE_DIR / "app" / "admin_static"), name="admin-static")
 
 app.include_router(types.router)
 app.include_router(locations.router)

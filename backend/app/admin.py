@@ -12,7 +12,7 @@ from starlette.responses import RedirectResponse
 from wtforms import FileField
 from wtforms.validators import Optional as OptionalValidator
 
-from app.config import settings
+from app.config import BASE_DIR, settings
 from app.models import (
     Arrondissement,
     Commune,
@@ -172,6 +172,9 @@ def register_admin(app, engine) -> Admin:
         engine,
         authentication_backend=AdminAuth(secret_key=settings.secret_key),
         title="PAGO Admin",
+        logo_url="/admin-static/logo.png",
+        favicon_url="/admin-static/logo.png",
+        templates_dir=str(BASE_DIR / "app" / "admin_templates"),
     )
 
     for view in [

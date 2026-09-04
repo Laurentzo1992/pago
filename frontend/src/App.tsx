@@ -53,7 +53,7 @@ export default function App() {
   return (
     <>
       <Navbar guides={guides} onToggleSidebar={() => setSidebarVisible((v) => !v)} />
-      <div id="map-wrapper" style={{ position: "relative", height: "calc(100vh - 56px)" }}>
+      <div id="map-wrapper">
         <Sidebar
           visible={sidebarVisible}
           types={types}
@@ -71,11 +71,12 @@ export default function App() {
         />
         <button
           id="slide_button"
-          className={`btn btn-dark d-flex align-items-center ${sidebarVisible ? "slide_button_visible" : ""}`}
+          className={sidebarVisible ? "slide_button_visible" : ""}
           type="button"
           onClick={() => setSidebarVisible((v) => !v)}
+          aria-label="Basculer le panneau de filtres"
         >
-          <i className={`fas fa-angle-double-right ${sidebarVisible ? "fa-rotate-180" : ""}`} />
+          <i className="fas fa-angle-double-right" />
         </button>
         <LegendPanel legend={legend} onClose={() => setLegend(null)} />
         <MapView types={types} infrastructures={infrastructures} focusInfrastructureId={focusInfrastructureId} />

@@ -12,7 +12,7 @@ interface Props {
 
 export default function TypeAccordion({ nodes, selectedTypes, onToggle, onShowLegend }: Props) {
   return (
-    <div className="accordion" id="types-accordion">
+    <div>
       {nodes.map((node) => (
         <TypeAccordionItem
           key={node.id}
@@ -43,48 +43,43 @@ function TypeAccordionItem({
   const state = triState(leafIds, selectedTypes);
   const checkboxId = `checkbox-type-${node.id}`;
 
-  const handleChange = () => {
-    onToggle(leafIds, !state.checked);
-  };
-
-  if (isLeaf) {
-    return (
-      <div className="accordion-body">
-        <div className="form-check" onMouseEnter={() => node.legend && onShowLegend(node)}>
-          <TriStateCheckbox
-            id={checkboxId}
-            checked={state.checked}
-            indeterminate={state.indeterminate}
-            onChange={handleChange}
-            className="form-check-input last-level-type"
-          />
-          <label className="form-check-label" htmlFor={checkboxId}>
-            {node.name}
-          </label>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="accordion-item">
-      <h2 className="accordion-header">
-        <div className="form-check accordion-button" onMouseEnter={() => node.legend && onShowLegend(node)}>
-          <TriStateCheckbox id={checkboxId} checked={state.checked} indeterminate={state.indeterminate} onChange={handleChange} />
-          <label
-            className="form-check-label flex-grow-1"
-            htmlFor={checkboxId}
-            onClick={(e) => {
-              e.preventDefault();
-              setExpanded((v) => !v);
-            }}
+    <div className="pago-node">
+      <div className="pago-node-row" onMouseEnter={() => node.legend && onShowLegend(node)}>
+        {isLeaf ? (
+          <span className="pago-node-caret-spacer" />
+        ) : (
+          <button
+            type="button"
+            className={`pago-node-caret ${expanded ? "open" : ""}`}
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? "Réduire" : "Développer"}
           >
-            {node.name}
-          </label>
-        </div>
-      </h2>
-      <div className={`accordion-collapse collapse ${expanded ? "show" : ""}`}>
-        <div className="accordion-body">
+            <i className="fas fa-chevron-right" />
+          </button>
+        )}
+        <TriStateCheckbox
+          id={checkboxId}
+          checked={state.checked}
+          indeterminate={state.indeterminate}
+          onChange={() => onToggle(leafIds, !state.checked)}
+          className="pago-checkbox"
+        />
+        <label
+          className="pago-node-label"
+          htmlFor={checkboxId}
+          onClick={(e) => {
+            if (isLeaf) return;
+            e.preventDefault();
+            setExpanded((v) => !v);
+          }}
+        >
+          {node.name}
+        </label>
+      </div>
+
+      {!isLeaf && expanded && (
+        <div className="pago-node-children">
           {node.children.map((child) => (
             <TypeAccordionItem
               key={child.id}
@@ -95,7 +90,7 @@ function TypeAccordionItem({
             />
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }

@@ -40,6 +40,7 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
     ctlZoomToFit.onAdd = () => {
       const div = L.DomUtil.create("div", "zoomtofit leaflet-bar");
       div.title = "Centrer la carte sur Ouagadougou";
+      div.innerHTML = '<i class="fas fa-crosshairs"></i>';
       div.onclick = () => map.setView(OUAGADOUGOU_CENTER, 13);
       L.DomEvent.on(div, "click", (ev: Event) => L.DomEvent.stopPropagation(ev));
       return div;

@@ -21,38 +21,24 @@ export default function ResultsTable({ infrastructures, onSelect }: Props) {
 
   return (
     <div>
-      <table id="infrastructures-table" className="table table-sm">
-        <tbody>
-          {pageItems.map((infra) => (
-            <tr key={infra.id} id={`result-${infra.id}`} onClick={() => onSelect(infra)} role="button">
-              <td>{infra.nom}</td>
-            </tr>
-          ))}
-          {pageItems.length === 0 && (
-            <tr>
-              <td className="text-muted">Aucun résultat</td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+      <div className="pago-results-list" id="infrastructures-table">
+        {pageItems.length === 0 && <div className="pago-result-empty">Aucun résultat pour ces filtres</div>}
+        {pageItems.map((infra) => (
+          <div className="pago-result-row" key={infra.id} id={`result-${infra.id}`} onClick={() => onSelect(infra)}>
+            {infra.nom}
+          </div>
+        ))}
+      </div>
       {pages > 1 && (
-        <div className="d-flex justify-content-between align-items-center">
-          <button
-            className="btn btn-sm btn-outline-secondary"
-            disabled={currentPage <= 1}
-            onClick={() => setPage((p) => p - 1)}
-          >
-            Précédent
+        <div className="pago-pagination">
+          <button disabled={currentPage <= 1} onClick={() => setPage((p) => p - 1)}>
+            <i className="fas fa-chevron-left" /> Précédent
           </button>
           <span>
             Page {currentPage} / {pages}
           </span>
-          <button
-            className="btn btn-sm btn-outline-secondary"
-            disabled={currentPage >= pages}
-            onClick={() => setPage((p) => p + 1)}
-          >
-            Suivant
+          <button disabled={currentPage >= pages} onClick={() => setPage((p) => p + 1)}>
+            Suivant <i className="fas fa-chevron-right" />
           </button>
         </div>
       )}

@@ -11,7 +11,7 @@ interface Props {
 
 export default function LocationAccordion({ communes, selectedQuarters, onToggle }: Props) {
   return (
-    <div className="accordion" id="locations-accordion">
+    <div>
       {communes.map((commune) => (
         <CommuneItem key={commune.id} commune={commune} selectedQuarters={selectedQuarters} onToggle={onToggle} />
       ))}
@@ -35,29 +35,37 @@ function CommuneItem({
   const checkboxId = `checkbox-commune-${commune.id}`;
 
   return (
-    <div className="accordion-item">
-      <h2 className="accordion-header">
-        <div className="form-check accordion-button">
-          <TriStateCheckbox
-            id={checkboxId}
-            checked={state.checked}
-            indeterminate={state.indeterminate}
-            onChange={() => onToggle(allIds, !state.checked)}
-          />
-          <label
-            className="form-check-label flex-grow-1"
-            htmlFor={checkboxId}
-            onClick={(e) => {
-              e.preventDefault();
-              setExpanded((v) => !v);
-            }}
-          >
-            {commune.name}
-          </label>
-        </div>
-      </h2>
-      <div className={`accordion-collapse collapse ${expanded ? "show" : ""}`}>
-        <div className="accordion-body">
+    <div className="pago-node">
+      <div className="pago-node-row">
+        <button
+          type="button"
+          className={`pago-node-caret ${expanded ? "open" : ""}`}
+          onClick={() => setExpanded((v) => !v)}
+          aria-label={expanded ? "Réduire" : "Développer"}
+        >
+          <i className="fas fa-chevron-right" />
+        </button>
+        <TriStateCheckbox
+          id={checkboxId}
+          checked={state.checked}
+          indeterminate={state.indeterminate}
+          onChange={() => onToggle(allIds, !state.checked)}
+          className="pago-checkbox"
+        />
+        <label
+          className="pago-node-label"
+          htmlFor={checkboxId}
+          onClick={(e) => {
+            e.preventDefault();
+            setExpanded((v) => !v);
+          }}
+        >
+          {commune.name}
+        </label>
+      </div>
+
+      {expanded && (
+        <div className="pago-node-children">
           {commune.arrondissements.map((arrondissement) => (
             <ArrondissementItem
               key={arrondissement.id}
@@ -68,7 +76,7 @@ function CommuneItem({
             />
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -89,53 +97,48 @@ function ArrondissementItem({
   const state = triState(ids, selectedQuarters);
   const checkboxId = `checkbox-arrondissement-${arrondissement.id}`;
 
-  if (!expandable) {
-    return (
-      <div className="accordion-body">
-        <div className="form-check">
-          <TriStateCheckbox
-            id={checkboxId}
-            checked={state.checked}
-            indeterminate={state.indeterminate}
-            onChange={() => onToggle(ids, !state.checked)}
-          />
-          <label className="form-check-label" htmlFor={checkboxId}>
-            {arrondissement.name}
-          </label>
-        </div>
-      </div>
-    );
-  }
-
   return (
-    <div className="accordion-item">
-      <h2 className="accordion-header">
-        <div className="form-check accordion-button">
-          <TriStateCheckbox
-            id={checkboxId}
-            checked={state.checked}
-            indeterminate={state.indeterminate}
-            onChange={() => onToggle(ids, !state.checked)}
-          />
-          <label
-            className="form-check-label flex-grow-1"
-            htmlFor={checkboxId}
-            onClick={(e) => {
-              e.preventDefault();
-              setExpanded((v) => !v);
-            }}
+    <div className="pago-node">
+      <div className="pago-node-row">
+        {expandable ? (
+          <button
+            type="button"
+            className={`pago-node-caret ${expanded ? "open" : ""}`}
+            onClick={() => setExpanded((v) => !v)}
+            aria-label={expanded ? "Réduire" : "Développer"}
           >
-            {arrondissement.name}
-          </label>
-        </div>
-      </h2>
-      <div className={`accordion-collapse collapse ${expanded ? "show" : ""}`}>
-        <div className="accordion-body">
+            <i className="fas fa-chevron-right" />
+          </button>
+        ) : (
+          <span className="pago-node-caret-spacer" />
+        )}
+        <TriStateCheckbox
+          id={checkboxId}
+          checked={state.checked}
+          indeterminate={state.indeterminate}
+          onChange={() => onToggle(ids, !state.checked)}
+          className="pago-checkbox"
+        />
+        <label
+          className="pago-node-label"
+          htmlFor={checkboxId}
+          onClick={(e) => {
+            if (!expandable) return;
+            e.preventDefault();
+            setExpanded((v) => !v);
+          }}
+        >
+          {arrondissement.name}
+        </label>
+      </div>
+
+      {expandable && expanded && (
+        <div className="pago-node-children">
           {arrondissement.secteurs.map((secteur) => (
             <SecteurItem key={secteur.id} secteur={secteur} selectedQuarters={selectedQuarters} onToggle={onToggle} />
           ))}
         </div>
-      </div>
+      )}
     </div>
   );
 }
@@ -154,18 +157,18 @@ function SecteurItem({
   const checkboxId = `checkbox-secteur-${secteur.id}`;
 
   return (
-    <div className="accordion-body">
-      <div className="form-check">
-        <TriStateCheckbox
-          id={checkboxId}
-          checked={state.checked}
-          indeterminate={state.indeterminate}
-          onChange={() => onToggle(ids, !state.checked)}
-        />
-        <label className="form-check-label" htmlFor={checkboxId}>
-          {secteur.name}
-        </label>
-      </div>
+    <div className="pago-node-row">
+      <span className="pago-node-caret-spacer" />
+      <TriStateCheckbox
+        id={checkboxId}
+        checked={state.checked}
+        indeterminate={state.indeterminate}
+        onChange={() => onToggle(ids, !state.checked)}
+        className="pago-checkbox"
+      />
+      <label className="pago-node-label" htmlFor={checkboxId}>
+        {secteur.name}
+      </label>
     </div>
   );
 }

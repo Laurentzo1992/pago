@@ -22,7 +22,7 @@ export default function TriStateCheckbox({ id, checked, indeterminate, onChange,
       ref={ref}
       id={id}
       type="checkbox"
-      className={className ?? "form-check-input"}
+      className={className ?? "pago-checkbox"}
       checked={checked}
       onChange={onChange}
     />

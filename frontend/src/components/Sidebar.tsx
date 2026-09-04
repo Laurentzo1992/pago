@@ -27,7 +27,7 @@ const TABS: { id: Tab; label: string }[] = [
   { id: "types", label: "Infrastructure" },
   { id: "emplacement", label: "Emplacement" },
   { id: "status", label: "Statut" },
-  { id: "result", label: "Rechercher" },
+  { id: "result", label: "Résultats" },
 ];
 
 export default function Sidebar(props: Props) {
@@ -35,48 +35,49 @@ export default function Sidebar(props: Props) {
 
   return (
     <div id="slide_menu" className={props.visible ? "slide_menu_visible" : ""}>
-      <h3 className="text-center">Filtrer par:</h3>
-      <div className="container mt-3">
-        <ul className="nav nav-tabs" role="tablist">
+      <div className="pago-sidebar-header">
+        <p className="pago-sidebar-title">Filtrer par</p>
+        <div className="pago-tabs" role="tablist">
           {TABS.map((tab) => (
-            <li className="nav-item" role="presentation" key={tab.id}>
-              <button
-                className={`nav-link ${activeTab === tab.id ? "active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                {tab.label}
-              </button>
-            </li>
+            <button
+              key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
+              className={`pago-tab ${activeTab === tab.id ? "active" : ""}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              {tab.label}
+            </button>
           ))}
-        </ul>
-
-        <div className="tab-content mt-2">
-          {activeTab === "types" && (
-            <TypeAccordion
-              nodes={props.types}
-              selectedTypes={props.selectedTypes}
-              onToggle={props.onToggleTypes}
-              onShowLegend={props.onShowLegend}
-            />
-          )}
-          {activeTab === "emplacement" && (
-            <LocationAccordion
-              communes={props.communes}
-              selectedQuarters={props.selectedQuarters}
-              onToggle={props.onToggleQuarters}
-            />
-          )}
-          {activeTab === "status" && (
-            <StatusFilter
-              statuses={props.statuses}
-              selectedStatuses={props.selectedStatuses}
-              onToggle={props.onToggleStatus}
-            />
-          )}
-          {activeTab === "result" && (
-            <ResultsTable infrastructures={props.infrastructures} onSelect={props.onSelectInfrastructure} />
-          )}
         </div>
+      </div>
+
+      <div className="pago-sidebar-body">
+        {activeTab === "types" && (
+          <TypeAccordion
+            nodes={props.types}
+            selectedTypes={props.selectedTypes}
+            onToggle={props.onToggleTypes}
+            onShowLegend={props.onShowLegend}
+          />
+        )}
+        {activeTab === "emplacement" && (
+          <LocationAccordion
+            communes={props.communes}
+            selectedQuarters={props.selectedQuarters}
+            onToggle={props.onToggleQuarters}
+          />
+        )}
+        {activeTab === "status" && (
+          <StatusFilter
+            statuses={props.statuses}
+            selectedStatuses={props.selectedStatuses}
+            onToggle={props.onToggleStatus}
+          />
+        )}
+        {activeTab === "result" && (
+          <ResultsTable infrastructures={props.infrastructures} onSelect={props.onSelectInfrastructure} />
+        )}
       </div>
     </div>
   );

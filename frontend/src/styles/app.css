@@ -1,3 +1,7 @@
+/* ==========================================================================
+   PAGO — design system overrides + component styles
+   ========================================================================== */
+
 html,
 body,
 #root {
@@ -14,29 +18,546 @@ body,
   box-sizing: inherit;
 }
 
-#map-wrapper {
-  position: relative;
+body {
+  font-family: var(--font-sans);
+  color: var(--color-body);
+  background: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+button {
+  font-family: inherit;
+}
+
+/* -------------------------------------------------------------------------
+   Header
+   ------------------------------------------------------------------------- */
+
+#banner {
+  height: var(--header-height);
+  min-height: var(--header-height);
+  background: var(--color-primary-700);
+  border-bottom: 1px solid var(--color-primary-900);
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: 0 var(--space-4);
+  z-index: 1100;
   overflow: hidden;
 }
 
-/* The original stylesheet never actually flips #legend's display back on
-   (`.legend_visible` only sets margin-left) - fixed here so the legend panel
-   is shown whenever it is mounted (see LegendPanel.tsx). */
-#legend {
-  display: block;
+.pago-menu-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: none;
+  background: transparent;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
 }
 
-#slide_button {
+.pago-menu-toggle:hover {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.pago-brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.15;
+  color: #fff;
+  text-decoration: none;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pago-brand-title,
+.pago-brand-subtitle {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pago-brand-title {
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+}
+
+.pago-brand-subtitle {
+  font-size: 11px;
+  color: var(--color-accent-100);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.pago-header-actions {
+  margin-left: auto;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pago-icon-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  text-decoration: none;
+  font-size: 15px;
+  transition: background-color 0.15s ease;
+}
+
+.pago-icon-link:hover {
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+}
+
+.pago-header-guide-empty {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.65);
+  padding: 0 var(--space-2);
+}
+
+.pago-logo {
+  height: 32px;
+  width: auto;
+  border-radius: var(--radius-sm);
+  background: #fff;
+  padding: 2px;
+}
+
+@media (max-width: 480px) {
+  #banner {
+    gap: var(--space-2);
+    padding: 0 var(--space-2);
+  }
+
+  .pago-brand-subtitle,
+  .pago-header-guide-empty {
+    display: none;
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Map wrapper / layout
+   ------------------------------------------------------------------------- */
+
+#map-wrapper {
+  position: relative;
+  overflow: hidden;
+  height: calc(100vh - var(--header-height));
+}
+
+#map {
+  width: 100%;
+  height: 100%;
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar
+   ------------------------------------------------------------------------- */
+
+#slide_menu {
+  position: absolute;
   top: 0;
-  left: 0px;
-  transition: left 0.5s;
+  left: 0;
+  bottom: 0;
+  width: var(--sidebar-width);
+  max-width: 90vw;
+  background: var(--color-surface);
+  box-shadow: var(--shadow-md);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(-100%);
+  transition: transform 0.28s ease;
+}
+
+#slide_menu.slide_menu_visible {
+  transform: translateX(0);
+}
+
+.pago-sidebar-header {
+  padding: var(--space-5) var(--space-5) var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.pago-sidebar-title {
+  margin: 0 0 var(--space-4);
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+}
+
+.pago-tabs {
+  display: flex;
+  gap: var(--space-1);
+  background: var(--color-bg);
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+}
+
+.pago-tab {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: var(--space-2) var(--space-2);
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--color-muted);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.pago-tab:hover {
+  color: var(--color-ink);
+}
+
+.pago-tab.active {
+  background: var(--color-surface);
+  color: var(--color-primary-700);
+  box-shadow: var(--shadow-sm);
+}
+
+.pago-sidebar-body {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: var(--space-3) var(--space-3) var(--space-6);
+}
+
+/* -------------------------------------------------------------------------
+   Accordion (type / location filters)
+   ------------------------------------------------------------------------- */
+
+.pago-node {
+  border-radius: var(--radius-sm);
+}
+
+.pago-node-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px var(--space-2);
+  border-radius: var(--radius-sm);
+  cursor: default;
+}
+
+.pago-node-row:hover {
+  background: var(--color-primary-50);
+}
+
+.pago-node-caret {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  color: var(--color-muted);
+  cursor: pointer;
+  font-size: 10px;
+  transition: transform 0.15s ease;
+}
+
+.pago-node-caret.open {
+  transform: rotate(90deg);
+}
+
+.pago-node-caret-spacer {
+  width: 18px;
+  flex-shrink: 0;
+}
+
+.pago-node-label {
+  flex: 1;
+  font-size: 13.5px;
+  color: var(--color-ink);
+  cursor: pointer;
+  user-select: none;
+  line-height: 1.35;
+}
+
+.pago-node-children {
+  padding-left: var(--space-5);
+}
+
+/* Checkbox: recolor the native control instead of building a custom one */
+.pago-checkbox {
+  appearance: auto;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: var(--color-primary-600);
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------
+   Status filter
+   ------------------------------------------------------------------------- */
+
+.pago-status-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.pago-status-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2);
+  border-radius: var(--radius-sm);
+}
+
+.pago-status-row:hover {
+  background: var(--color-primary-50);
+}
+
+.pago-status-row label {
+  font-size: 13.5px;
+  color: var(--color-ink);
+  cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------
+   Results table
+   ------------------------------------------------------------------------- */
+
+.pago-results-list {
+  display: flex;
+  flex-direction: column;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--color-border);
+}
+
+.pago-result-row {
+  padding: 10px var(--space-3);
+  font-size: 13.5px;
+  color: var(--color-ink);
+  cursor: pointer;
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color 0.15s ease;
+}
+
+.pago-result-row:last-child {
+  border-bottom: none;
+}
+
+.pago-result-row:hover {
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+}
+
+.pago-result-empty {
+  padding: var(--space-4) var(--space-3);
+  font-size: 13px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.pago-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: var(--space-3);
+  font-size: 12.5px;
+  color: var(--color-muted);
+}
+
+.pago-pagination button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  color: var(--color-ink);
+  padding: 6px var(--space-3);
+  border-radius: var(--radius-pill);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.15s ease, color 0.15s ease;
+}
+
+.pago-pagination button:hover:not(:disabled) {
+  border-color: var(--color-primary-600);
+  color: var(--color-primary-700);
+}
+
+.pago-pagination button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* -------------------------------------------------------------------------
+   Sidebar toggle
+   ------------------------------------------------------------------------- */
+
+#slide_button {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-3);
+  z-index: 1050;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background: var(--color-surface);
+  color: var(--color-ink);
+  box-shadow: var(--shadow-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: left 0.28s ease;
+}
+
+#slide_button:hover {
+  color: var(--color-primary-700);
+}
+
+#slide_button .fa-angle-double-right {
+  transition: transform 0.28s ease;
 }
 
 #slide_button.slide_button_visible {
-  left: 400px;
+  left: calc(var(--sidebar-width) + var(--space-3));
 }
 
-.nav-link.btn.btn-link {
-  text-decoration: none;
+#slide_button.slide_button_visible .fa-angle-double-right {
+  transform: rotate(180deg);
+}
+
+@media (max-width: 640px) {
+  #slide_button.slide_button_visible {
+    left: calc(90vw + var(--space-3));
+  }
+}
+
+/* -------------------------------------------------------------------------
+   Legend panel
+   ------------------------------------------------------------------------- */
+
+#legend {
+  position: absolute;
+  left: var(--space-3);
+  bottom: var(--space-4);
+  z-index: 1000;
+  width: 260px;
+  max-width: calc(100vw - 2 * var(--space-3));
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+}
+
+.pago-legend-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-2);
+}
+
+.pago-legend-title {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-muted);
+}
+
+#legend .close {
   border: none;
+  background: transparent;
+  color: var(--color-muted);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+}
+
+#legend .close:hover {
+  color: var(--color-ink);
+}
+
+#legend_container {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+#legend_image {
+  width: 32px;
+  height: 32px;
+  object-fit: contain;
+  flex-shrink: 0;
+}
+
+#legend_container p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--color-ink);
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------------------------
+   Leaflet chrome
+   ------------------------------------------------------------------------- */
+
+.leaflet-bar,
+.leaflet-bar a {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-sm) !important;
+  border-color: var(--color-border) !important;
+}
+
+.leaflet-control-zoom {
+  box-shadow: var(--shadow-md) !important;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.leaflet-popup-content {
+  margin: var(--space-3);
+  font-size: 13px;
+  color: var(--color-ink);
+}
+
+.leaflet-popup-content b {
+  color: var(--color-primary-700);
+}
+
+.zoomtofit {
+  background: var(--color-surface) !important;
+  color: var(--color-ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+}
+
+.zoomtofit:hover {
+  color: var(--color-primary-700);
+  background: var(--color-primary-50) !important;
 }

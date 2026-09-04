@@ -1,0 +1,98 @@
+/* PAGO admin theme — overrides the default Tabler palette used by sqladmin
+   to match the public app's institutional green/gold identity. */
+
+:root,
+:host {
+  --tblr-primary: #1b5e46;
+  --tblr-primary-rgb: 27, 94, 70;
+  --tblr-primary-text: #123f30;
+  --tblr-primary-fg: #ffffff;
+  --tblr-primary-bg-subtle: #e7f2ed;
+  --tblr-primary-border-subtle: #a9d0bd;
+
+  --tblr-font-sans-serif: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+  background: #f4f6f7;
+}
+
+/* Left navigation */
+.navbar-vertical.navbar-dark {
+  background: #123f30;
+}
+
+.navbar-vertical .navbar-brand {
+  padding: 1rem 0;
+}
+
+.navbar-vertical .navbar-brand-image {
+  border-radius: 8px;
+  background: #fff;
+  padding: 4px;
+}
+
+.navbar-vertical .nav-link {
+  color: rgba(255, 255, 255, 0.75);
+  border-radius: 8px;
+  margin: 1px 0;
+}
+
+.navbar-vertical .nav-link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.navbar-vertical .nav-link.active {
+  color: #fff;
+  background: #1b5e46;
+}
+
+.navbar-vertical .btn-secondary {
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.25);
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.navbar-vertical .btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+/* Buttons / links / focus states inherit --tblr-primary automatically,
+   this just tightens a couple of spots that hardcode blues. */
+a {
+  color: var(--tblr-primary);
+}
+
+.page-title {
+  color: #1c2331;
+  font-weight: 700;
+}
+
+.card {
+  border-radius: 12px;
+}
+
+.btn-primary {
+  background: var(--tblr-primary);
+  border-color: var(--tblr-primary);
+}
+
+.btn-primary:hover {
+  background: #123f30;
+  border-color: #123f30;
+}
+
+/* Give the primary "Save" action visual priority over the secondary
+   save-variants and Cancel on create/edit forms. */
+input[type="submit"][value="Save"] {
+  background: var(--tblr-primary);
+  border-color: var(--tblr-primary);
+  color: #fff;
+}
+
+input[type="submit"][value="Save"]:hover {
+  background: #123f30;
+  border-color: #123f30;
+}
