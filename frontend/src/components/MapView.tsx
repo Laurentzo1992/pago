@@ -1,7 +1,6 @@
 import { useEffect, useRef } from "react";
 import type { Infrastructure, TypeNode } from "../types";
-import { buildTypeIcons } from "../utils/icons";
-import defaultIconUrl from "../assets/img/rectangle-red.png";
+import { buildTypeIcons, fallbackIcon } from "../utils/icons";
 
 declare const L: typeof import("leaflet");
 
@@ -27,11 +26,33 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
     const map = L.map(containerRef.current, { maxZoom: 18, zoomControl: false });
     map.setView(OUAGADOUGOU_CENTER, 10);
 
-    const osm = L.tileLayer("http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18,
+    const streets = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19,
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
     });
-    osm.addTo(map);
+
+    const satelliteImagery = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+      {
+        maxZoom: 19,
+        attribution: "Tiles &copy; Esri &mdash; Source: Esri, Maxar, Earthstar Geographics, and the GIS community",
+      },
+    );
+    const satelliteLabels = L.tileLayer(
+      "https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}",
+      { maxZoom: 19 },
+    );
+    const hybrid = L.layerGroup([satelliteImagery, satelliteLabels]);
+
+    streets.addTo(map);
+
+    L.control
+      .layers(
+        { "Plan": streets, "Satellite": satelliteImagery, "Hybride": hybrid },
+        {},
+        { position: "topright" },
+      )
+      .addTo(map);
 
     L.control.zoom({ position: "topright" }).addTo(map);
     L.control.scale({ metric: true, imperial: false, position: "bottomright" }).addTo(map);
@@ -71,12 +92,7 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
 
   // Rebuild the icon lookup whenever the type tree changes.
   useEffect(() => {
-    const defaultIcon = L.icon({
-      iconUrl: defaultIconUrl,
-      iconSize: [4, 4],
-      iconAnchor: [2, 0],
-    });
-    iconsRef.current = buildTypeIcons(types, defaultIcon);
+    iconsRef.current = buildTypeIcons(types);
   }, [types]);
 
   // Rebuild markers whenever the filtered infrastructure list changes.
@@ -90,8 +106,8 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
       const lng = Number(infra.longitude);
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) return;
 
-      const icon = (infra.type_id !== null && iconsRef.current.get(infra.type_id)) || undefined;
-      const marker = L.marker([lat, lng], icon ? { icon } : undefined);
+      const icon = (infra.type_id !== null && iconsRef.current.get(infra.type_id)) || fallbackIcon();
+      const marker = L.marker([lat, lng], { icon });
       marker.bindPopup(`<b>${infra.nom ?? ""}</b><br><b>Emplacement: </b>${infra.emplacement ?? ""}<br>`);
       markers.set(infra.id, marker);
     });

@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { fetchGuides, fetchInfrastructures, fetchLocations, fetchStatuses, fetchTypes } from "./api/client";
-import type { CommuneNode, GuideItem, Infrastructure, LegendInfo, StatusItem, TypeNode } from "./types";
+import { fetchGuides, fetchInfrastructures, fetchLocations, fetchStats, fetchStatuses, fetchTypes } from "./api/client";
+import type { CommuneNode, GuideItem, Infrastructure, LegendInfo, Stats, StatusItem, TypeNode } from "./types";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MapView from "./components/MapView";
 import LegendPanel from "./components/LegendPanel";
+import Analytics from "./components/Analytics";
 
 function toggleIds(set: Set<number>, ids: number[], checked: boolean): Set<number> {
   const next = new Set(set);
@@ -26,6 +27,9 @@ export default function App() {
   const [focusInfrastructureId, setFocusInfrastructureId] = useState<number | null>(null);
   const [legend, setLegend] = useState<LegendInfo | null>(null);
   const [sidebarVisible, setSidebarVisible] = useState(true);
+
+  const [analyticsVisible, setAnalyticsVisible] = useState(false);
+  const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {
     fetchTypes().then(setTypes).catch(() => alert("Impossible de joindre le serveur"));
@@ -50,9 +54,25 @@ export default function App() {
       .catch((err) => console.error("Error fetching data:", err));
   }, [selectedTypes, selectedQuarters, selectedStatuses]);
 
+  useEffect(() => {
+    if (!analyticsVisible) return;
+    fetchStats({
+      selectedTypes: Array.from(selectedTypes),
+      selectedQuarters: Array.from(selectedQuarters),
+      selectedStatuses: Array.from(selectedStatuses),
+    })
+      .then(setStats)
+      .catch((err) => console.error("Error fetching stats:", err));
+  }, [analyticsVisible, selectedTypes, selectedQuarters, selectedStatuses]);
+
   return (
     <>
-      <Navbar guides={guides} onToggleSidebar={() => setSidebarVisible((v) => !v)} />
+      <Navbar
+        guides={guides}
+        onToggleSidebar={() => setSidebarVisible((v) => !v)}
+        onToggleAnalytics={() => setAnalyticsVisible((v) => !v)}
+        analyticsActive={analyticsVisible}
+      />
       <div id="map-wrapper">
         <Sidebar
           visible={sidebarVisible}
@@ -79,6 +99,13 @@ export default function App() {
           <i className="fas fa-angle-double-right" />
         </button>
         <LegendPanel legend={legend} onClose={() => setLegend(null)} />
+        <Analytics
+          visible={analyticsVisible}
+          stats={stats}
+          types={types}
+          statuses={statuses}
+          onClose={() => setAnalyticsVisible(false)}
+        />
         <MapView types={types} infrastructures={infrastructures} focusInfrastructureId={focusInfrastructureId} />
       </div>
     </>

@@ -90,3 +90,28 @@ class PaginatedInfrastructuresOut(BaseModel):
     total_items: int
     page: int
     pages: int
+
+
+class CategoryStat(BaseModel):
+    type_id: int
+    name: str
+    count: int
+
+
+class StatusStat(BaseModel):
+    status_id: int
+    name: str
+    count: int
+
+
+class CommuneStat(BaseModel):
+    commune_id: int
+    name: str
+    count: int
+
+
+class StatsOut(BaseModel):
+    total: int
+    by_category: list[CategoryStat]
+    by_status: list[StatusStat]
+    top_communes: list[CommuneStat]

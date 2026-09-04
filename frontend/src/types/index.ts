@@ -45,6 +45,31 @@ export interface GuideItem {
   url: string | null;
 }
 
+export interface CategoryStat {
+  type_id: number;
+  name: string;
+  count: number;
+}
+
+export interface StatusStat {
+  status_id: number;
+  name: string;
+  count: number;
+}
+
+export interface CommuneStat {
+  commune_id: number;
+  name: string;
+  count: number;
+}
+
+export interface Stats {
+  total: number;
+  by_category: CategoryStat[];
+  by_status: StatusStat[];
+  top_communes: CommuneStat[];
+}
+
 export interface Infrastructure {
   id: number;
   nom: string | null;

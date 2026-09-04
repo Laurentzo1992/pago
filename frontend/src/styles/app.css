@@ -122,6 +122,16 @@ button {
   color: #fff;
 }
 
+.pago-icon-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+}
+
+.pago-icon-btn.active {
+  background: rgba(255, 255, 255, 0.22);
+}
+
 .pago-header-guide-empty {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.65);
@@ -161,6 +171,16 @@ button {
 #map {
   width: 100%;
   height: 100%;
+}
+
+/* Leaflet's control panes default to the same z-index (1000) as our
+   sidebar/legend/analytics overlays; since the map mounts after them in the
+   DOM, ties would otherwise resolve in the map's favor and any left-side
+   Leaflet control would render on top of the open sidebar. Keep all map
+   chrome strictly below our own overlay panels. */
+.leaflet-top,
+.leaflet-bottom {
+  z-index: 900 !important;
 }
 
 /* -------------------------------------------------------------------------
@@ -283,6 +303,14 @@ button {
 .pago-node-caret-spacer {
   width: 18px;
   flex-shrink: 0;
+}
+
+.pago-node-swatch {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px var(--color-border);
 }
 
 .pago-node-label {
@@ -484,7 +512,8 @@ button {
   color: var(--color-muted);
 }
 
-#legend .close {
+#legend .close,
+#analytics_panel .close {
   border: none;
   background: transparent;
   color: var(--color-muted);
@@ -494,7 +523,8 @@ button {
   padding: 0;
 }
 
-#legend .close:hover {
+#legend .close:hover,
+#analytics_panel .close:hover {
   color: var(--color-ink);
 }
 
@@ -560,4 +590,235 @@ button {
 .zoomtofit:hover {
   color: var(--color-primary-700);
   background: var(--color-primary-50) !important;
+}
+
+.leaflet-control-layers {
+  border-radius: var(--radius-sm) !important;
+  box-shadow: var(--shadow-md) !important;
+  border: none !important;
+  font-family: var(--font-sans);
+}
+
+.leaflet-control-layers-toggle {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.leaflet-control-layers-expanded {
+  padding: var(--space-2) var(--space-3) !important;
+  color: var(--color-ink);
+}
+
+.leaflet-control-layers label {
+  font-size: 13px;
+  margin: 4px 0;
+}
+
+.leaflet-control-layers-selector {
+  accent-color: var(--color-primary-600);
+}
+
+.leaflet-control-layers-separator {
+  border-color: var(--color-border) !important;
+}
+
+/* -------------------------------------------------------------------------
+   Analytics: docked panel + detachable floating cards
+   ------------------------------------------------------------------------- */
+
+#analytics_panel {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-3);
+  z-index: 999;
+  width: 300px;
+  max-width: calc(100vw - 2 * var(--space-3));
+  max-height: calc(100% - 2 * var(--space-4));
+  overflow-y: auto;
+  background: var(--color-surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-4);
+}
+
+.pago-analytics-empty {
+  margin: var(--space-2) 0 0;
+  font-size: 12.5px;
+  color: var(--color-muted);
+  text-align: center;
+}
+
+.pago-analytics-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  margin-top: var(--space-3);
+  overflow: hidden;
+  background: var(--color-surface);
+}
+
+.pago-analytics-card.floating {
+  position: fixed;
+  width: 300px;
+  box-shadow: var(--shadow-md);
+}
+
+.pago-analytics-card-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-primary-50);
+  color: var(--color-primary-700);
+  font-size: 11.5px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.pago-analytics-card-header.draggable {
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.pago-analytics-card-header.draggable:active {
+  cursor: grabbing;
+}
+
+.pago-analytics-card-title {
+  flex: 1;
+}
+
+.pago-analytics-card-btn {
+  border: none;
+  background: transparent;
+  color: var(--color-primary-700);
+  cursor: pointer;
+  width: 22px;
+  height: 22px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pago-analytics-card-btn:hover {
+  background: var(--color-primary-100);
+}
+
+.pago-analytics-card-body {
+  padding: var(--space-3);
+}
+
+/* Bar chart */
+
+.pago-barchart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.pago-barchart-row {
+  display: grid;
+  grid-template-columns: 96px 1fr auto;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.pago-barchart-label {
+  font-size: 11px;
+  color: var(--color-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pago-barchart-track {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--color-bg);
+  overflow: hidden;
+}
+
+.pago-barchart-fill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  transition: width 0.25s ease;
+}
+
+.pago-barchart-value {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-ink);
+  min-width: 34px;
+  text-align: right;
+}
+
+/* Donut chart */
+
+.pago-donut {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.pago-donut-ring {
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pago-donut-hole {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--color-surface);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pago-donut-total {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+.pago-donut-legend {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  min-width: 0;
+}
+
+.pago-donut-legend-row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 11.5px;
+}
+
+.pago-donut-swatch {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.pago-donut-legend-label {
+  color: var(--color-body);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pago-donut-legend-value {
+  margin-left: auto;
+  font-weight: 600;
+  color: var(--color-ink);
+  white-space: nowrap;
 }

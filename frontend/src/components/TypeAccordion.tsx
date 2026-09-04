@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { TypeNode } from "../types";
 import { collectLeafTypeIds, triState } from "../utils/tree";
+import { categoricalColor } from "../utils/colors";
 import TriStateCheckbox from "./TriStateCheckbox";
 
 interface Props {
@@ -13,10 +14,11 @@ interface Props {
 export default function TypeAccordion({ nodes, selectedTypes, onToggle, onShowLegend }: Props) {
   return (
     <div>
-      {nodes.map((node) => (
+      {nodes.map((node, index) => (
         <TypeAccordionItem
           key={node.id}
           node={node}
+          color={categoricalColor(index, nodes.length)}
           selectedTypes={selectedTypes}
           onToggle={onToggle}
           onShowLegend={onShowLegend}
@@ -28,11 +30,13 @@ export default function TypeAccordion({ nodes, selectedTypes, onToggle, onShowLe
 
 function TypeAccordionItem({
   node,
+  color,
   selectedTypes,
   onToggle,
   onShowLegend,
 }: {
   node: TypeNode;
+  color?: string;
   selectedTypes: Set<number>;
   onToggle: (ids: number[], checked: boolean) => void;
   onShowLegend: (node: TypeNode) => void;
@@ -65,6 +69,7 @@ function TypeAccordionItem({
           onChange={() => onToggle(leafIds, !state.checked)}
           className="pago-checkbox"
         />
+        {color && <span className="pago-node-swatch" style={{ backgroundColor: color }} />}
         <label
           className="pago-node-label"
           htmlFor={checkboxId}

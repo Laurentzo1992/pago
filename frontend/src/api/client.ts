@@ -1,4 +1,4 @@
-import type { CommuneNode, GuideItem, Infrastructure, StatusItem, TypeNode } from "../types";
+import type { CommuneNode, GuideItem, Infrastructure, Stats, StatusItem, TypeNode } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -46,4 +46,20 @@ export async function fetchInfrastructures(filters: InfrastructureFilters): Prom
     throw new Error(`POST /api/infrastructures failed: ${res.status}`);
   }
   return res.json() as Promise<Infrastructure[]>;
+}
+
+export async function fetchStats(filters: InfrastructureFilters): Promise<Stats> {
+  const res = await fetch(`${API_BASE}/api/stats`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      selected_types: filters.selectedTypes,
+      selected_quarters: filters.selectedQuarters,
+      selected_statuses: filters.selectedStatuses,
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`POST /api/stats failed: ${res.status}`);
+  }
+  return res.json() as Promise<Stats>;
 }
