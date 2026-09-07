@@ -8,7 +8,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from app.admin import register_admin
 from app.config import BASE_DIR, settings
 from app.database import engine
-from app.routers import guides, infrastructures, locations, stats, status, types
+from app.routers import guides, infrastructures, locations, stats, status, trackers, types
 
 # Python's mimetypes module has no built-in mapping for .geojson, so
 # StaticFiles would otherwise serve the /geo/*.geojson overlays as text/plain.
@@ -35,6 +35,7 @@ app.include_router(status.router)
 app.include_router(infrastructures.router)
 app.include_router(guides.router)
 app.include_router(stats.router)
+app.include_router(trackers.router)
 
 register_admin(app, engine)
 

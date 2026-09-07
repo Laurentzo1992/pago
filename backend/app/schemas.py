@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from datetime import datetime
+
 from pydantic import BaseModel, ConfigDict
 
 
@@ -121,3 +123,20 @@ class StatsOut(BaseModel):
     by_status: list[StatusStat]
     top_communes: list[CommuneStat]
     by_condition: list[ConditionStat]
+
+
+class TrackerPositionIn(BaseModel):
+    lat: float
+    lng: float
+    accuracy: float | None = None
+
+
+class TrackerOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    name: str
+    last_lat: float | None
+    last_lng: float | None
+    last_accuracy: float | None
+    last_seen_at: datetime | None

@@ -1,4 +1,4 @@
-import type { CommuneNode, GuideItem, Infrastructure, Stats, StatusItem, TypeNode } from "../types";
+import type { CommuneNode, GuideItem, Infrastructure, Stats, StatusItem, TrackerItem, TypeNode } from "../types";
 
 const API_BASE = import.meta.env.VITE_API_BASE_URL ?? "";
 
@@ -24,6 +24,10 @@ export function fetchStatuses(): Promise<StatusItem[]> {
 
 export function fetchGuides(): Promise<GuideItem[]> {
   return getJson<GuideItem[]>("/api/guides");
+}
+
+export function fetchTrackers(): Promise<TrackerItem[]> {
+  return getJson<TrackerItem[]>("/api/trackers");
 }
 
 export interface InfrastructureFilters {

@@ -1,11 +1,22 @@
-import { useEffect, useState } from "react";
-import { fetchGuides, fetchInfrastructures, fetchLocations, fetchStats, fetchStatuses, fetchTypes } from "./api/client";
-import type { CommuneNode, GuideItem, Infrastructure, LegendInfo, Stats, StatusItem, TypeNode } from "./types";
+import { useEffect, useMemo, useState } from "react";
+import {
+  fetchGuides,
+  fetchInfrastructures,
+  fetchLocations,
+  fetchStats,
+  fetchStatuses,
+  fetchTrackers,
+  fetchTypes,
+} from "./api/client";
+import type { CommuneNode, GuideItem, Infrastructure, LegendInfo, Stats, StatusItem, TrackerItem, TypeNode } from "./types";
+import { findNearestInfrastructure, haversineDistanceMeters } from "./utils/distance";
+import { useLiveGeolocation } from "./utils/geolocation";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
 import MapView from "./components/MapView";
 import LegendPanel from "./components/LegendPanel";
 import Analytics from "./components/Analytics";
+import LivePositionBadge from "./components/LivePositionBadge";
 
 function toggleIds(set: Set<number>, ids: number[], checked: boolean): Set<number> {
   const next = new Set(set);
@@ -31,6 +42,33 @@ export default function App() {
   const [analyticsVisible, setAnalyticsVisible] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
 
+  const [locationEnabled, setLocationEnabled] = useState(false);
+  const { position, error: geoError } = useLiveGeolocation(locationEnabled);
+
+  const [trackers, setTrackers] = useState<TrackerItem[]>([]);
+
+  // The infrastructure to measure the live distance against: whichever one
+  // was last selected from the results list (if it's still in the current
+  // filtered set), otherwise the closest one currently on the map.
+  const distanceTarget = useMemo(() => {
+    if (!position) return null;
+
+    const selected =
+      focusInfrastructureId !== null
+        ? infrastructures.find((infra) => infra.id === focusInfrastructureId)
+        : undefined;
+
+    if (selected) {
+      const lat = Number(selected.latitude);
+      const lng = Number(selected.longitude);
+      if (Number.isFinite(lat) && Number.isFinite(lng)) {
+        return { infra: selected, distanceMeters: haversineDistanceMeters(position.lat, position.lng, lat, lng) };
+      }
+    }
+
+    return findNearestInfrastructure(position, infrastructures);
+  }, [position, infrastructures, focusInfrastructureId]);
+
   useEffect(() => {
     fetchTypes().then(setTypes).catch(() => alert("Impossible de joindre le serveur"));
     fetchLocations().then(setCommunes).catch(() => alert("Impossible de joindre le serveur"));
@@ -53,6 +91,15 @@ export default function App() {
       .then(setInfrastructures)
       .catch((err) => console.error("Error fetching data:", err));
   }, [selectedTypes, selectedQuarters, selectedStatuses]);
+
+  // Poll GPS-equipped equipment positions so their markers stay live on the
+  // map without the user needing to refresh the page.
+  useEffect(() => {
+    const poll = () => fetchTrackers().then(setTrackers).catch((err) => console.error("Error fetching trackers:", err));
+    poll();
+    const intervalId = setInterval(poll, 10_000);
+    return () => clearInterval(intervalId);
+  }, []);
 
   useEffect(() => {
     if (!analyticsVisible) return;
@@ -106,7 +153,28 @@ export default function App() {
           statuses={statuses}
           onClose={() => setAnalyticsVisible(false)}
         />
-        <MapView types={types} infrastructures={infrastructures} focusInfrastructureId={focusInfrastructureId} />
+        <LivePositionBadge
+          error={geoError}
+          target={
+            distanceTarget
+              ? {
+                  id: distanceTarget.infra.id,
+                  name: distanceTarget.infra.nom ?? "Infrastructure",
+                  distanceMeters: distanceTarget.distanceMeters,
+                }
+              : null
+          }
+          onFocus={setFocusInfrastructureId}
+        />
+        <MapView
+          types={types}
+          infrastructures={infrastructures}
+          focusInfrastructureId={focusInfrastructureId}
+          position={position}
+          locationEnabled={locationEnabled}
+          onToggleLocation={() => setLocationEnabled((v) => !v)}
+          trackers={trackers}
+        />
       </div>
     </>
   );

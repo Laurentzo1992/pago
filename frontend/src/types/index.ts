@@ -76,6 +76,15 @@ export interface Stats {
   by_condition: ConditionStat[];
 }
 
+export interface TrackerItem {
+  id: number;
+  name: string;
+  last_lat: number | null;
+  last_lng: number | null;
+  last_accuracy: number | null;
+  last_seen_at: string | null;
+}
+
 export interface Infrastructure {
   id: number;
   nom: string | null;

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
-from sqlalchemy import ForeignKey, String, Text, UniqueConstraint
+from datetime import datetime
+
+from sqlalchemy import DateTime, ForeignKey, String, Text, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -147,6 +149,50 @@ class Guide(Base):
 
     def __str__(self) -> str:
         return self.file or ""
+
+
+class Tracker(Base):
+    """A GPS-equipped piece of equipment reporting its own live position.
+
+    Configured client-side (e.g. an OwnTracks/GPSLogger phone, or a DIY
+    ESP32+GPS device) to POST to /api/trackers/{api_key}/positions with its
+    own api_key. last_lat/last_lng/last_seen_at are denormalized here (kept
+    in sync with the latest TrackerPosition row) so the admin list and the
+    map's polling endpoint don't need a join for the common case.
+    """
+
+    __tablename__ = "trackers"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    name: Mapped[str] = mapped_column(String(100))
+    api_key: Mapped[str] = mapped_column(String(64), unique=True)
+
+    last_lat: Mapped[float | None] = mapped_column(nullable=True)
+    last_lng: Mapped[float | None] = mapped_column(nullable=True)
+    last_accuracy: Mapped[float | None] = mapped_column(nullable=True)
+    last_seen_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+
+    positions: Mapped[list["TrackerPosition"]] = relationship(
+        back_populates="tracker", cascade="all, delete-orphan"
+    )
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class TrackerPosition(Base):
+    """Append-only position history for a Tracker."""
+
+    __tablename__ = "tracker_positions"
+
+    id: Mapped[int] = mapped_column(primary_key=True)
+    tracker_id: Mapped[int] = mapped_column(ForeignKey("trackers.id", ondelete="CASCADE"))
+    lat: Mapped[float]
+    lng: Mapped[float]
+    accuracy: Mapped[float | None] = mapped_column(nullable=True)
+    recorded_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    tracker: Mapped[Tracker] = relationship(back_populates="positions")
 
 
 class Legend(Base):

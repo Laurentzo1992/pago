@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hmac
+import secrets
 import uuid
 from pathlib import Path
 
@@ -24,6 +25,7 @@ from app.models import (
     Repondant,
     Secteur,
     Status,
+    Tracker,
     Type,
 )
 
@@ -120,6 +122,55 @@ class InfrastructureAdmin(ModelView, model=Infrastructure):
     name_plural = "Infrastructures"
 
 
+def _format_tracker_key_short(obj, attr) -> Markup | str:
+    if not obj.api_key:
+        return ""
+    return Markup(f'<code>{obj.api_key}</code>')
+
+
+def _format_tracker_endpoint(obj, attr) -> Markup | str:
+    if not obj.api_key:
+        return ""
+    json_path = f"/api/trackers/{obj.api_key}/positions"
+    muted = 'style="color:#8a94a6;"'
+    return Markup(
+        f'<b>Traccar Client</b> (app Android/iOS, recommandé) <span {muted}>— aucune config JSON</span><br>'
+        f'URL serveur : <code>/api/trackers/positions</code><br>'
+        f'Identifiant appareil : <code>{obj.api_key}</code>'
+        f"<br><br>"
+        f'<b>Appareil DIY / app avec URL personnalisée</b><br>'
+        f'<code>POST {json_path}</code><br>'
+        f'<span {muted}>Corps JSON : {{"lat": ..., "lng": ..., "accuracy": ...}}</span>'
+    )
+
+
+class TrackerAdmin(ModelView, model=Tracker):
+    # api_key shown right in the list (not just on the detail page) so it's
+    # immediately visible after creating a tracker, instead of requiring a
+    # click into the detail view to find the identifier to configure.
+    column_list = [Tracker.id, Tracker.name, Tracker.api_key, Tracker.last_lat, Tracker.last_lng, Tracker.last_seen_at]
+    column_details_list = [
+        Tracker.id,
+        Tracker.name,
+        Tracker.api_key,
+        Tracker.last_lat,
+        Tracker.last_lng,
+        Tracker.last_accuracy,
+        Tracker.last_seen_at,
+    ]
+    column_formatters = {Tracker.api_key: _format_tracker_key_short}
+    column_formatters_detail = {Tracker.api_key: _format_tracker_endpoint}
+    # api_key and the last-position fields are system-managed (set on
+    # creation / by incoming position reports), not hand-edited.
+    form_columns = [Tracker.name]
+    name_plural = "Traceurs GPS"
+    name = "Traceur GPS"
+
+    async def on_model_change(self, data: dict, model: Tracker, is_created: bool, request: Request) -> None:
+        if is_created:
+            data["api_key"] = secrets.token_urlsafe(24)
+
+
 def _format_guide_link(obj, attr) -> Markup | str:
     if not obj.file:
         return ""
@@ -189,6 +240,7 @@ def register_admin(app, engine) -> Admin:
         StatusAdmin,
         RepondantAdmin,
         InfrastructureAdmin,
+        TrackerAdmin,
         GuideAdmin,
         LegendAdmin,
     ]:
