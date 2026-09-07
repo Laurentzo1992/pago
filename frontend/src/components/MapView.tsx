@@ -133,7 +133,7 @@ export default function MapView({
     );
     const hybrid = L.layerGroup([satelliteImagery, satelliteLabels]);
 
-    streets.addTo(map);
+    hybrid.addTo(map);
 
     const layersControl = L.control
       .layers(
