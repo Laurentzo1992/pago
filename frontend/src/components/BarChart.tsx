@@ -15,16 +15,16 @@ export default function BarChart({ data }: Props) {
     <div className="pago-barchart">
       {data.map((d) => (
         <div className="pago-barchart-row" key={d.label}>
-          <span className="pago-barchart-label" title={d.label}>
-            {d.label}
-          </span>
+          <div className="pago-barchart-row-top">
+            <span className="pago-barchart-label">{d.label}</span>
+            <span className="pago-barchart-value">{d.value.toLocaleString("fr-FR")}</span>
+          </div>
           <div className="pago-barchart-track">
             <div
               className="pago-barchart-fill"
               style={{ width: `${(d.value / max) * 100}%`, backgroundColor: d.color }}
             />
           </div>
-          <span className="pago-barchart-value">{d.value.toLocaleString("fr-FR")}</span>
         </div>
       ))}
     </div>

@@ -28,7 +28,7 @@ export default function App() {
   const [legend, setLegend] = useState<LegendInfo | null>(null);
   const [sidebarVisible, setSidebarVisible] = useState(true);
 
-  const [analyticsVisible, setAnalyticsVisible] = useState(false);
+  const [analyticsVisible, setAnalyticsVisible] = useState(true);
   const [stats, setStats] = useState<Stats | null>(null);
 
   useEffect(() => {

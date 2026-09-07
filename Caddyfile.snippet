@@ -1,0 +1,21 @@
+## Not mounted by anything in this repo.
+##
+## PAGO does not run its own Caddy - it shares the kbbot-caddy container
+## already running on this VPS (it fronts kbot, oser-bf.org, logo-services.com
+## and my-love too, all on the "kbbot_backend" Docker network). Append this
+## block as a NEW top-level site in kbbot-caddy's Caddyfile - see DEPLOY.md
+## section 3. No changes needed to that Caddyfile's existing blocks, and no
+## docker-compose.yml edits either - kbbot-caddy already sits on the network
+## PAGO's frontend container joins.
+##
+## Unlike kbot's block, PAGO needs a single reverse_proxy for everything:
+## the frontend container's own nginx (frontend/nginx.conf) already routes
+## /api, /admin, /admin-static, /media and /geo to the backend internally.
+##
+## The target is "pago-frontend" (not "frontend") on purpose: kbot's own
+## frontend service is already reachable as "frontend" on this same network -
+## a bare "frontend" here would collide with it.
+
+pago.logo-services.com {
+	reverse_proxy pago-frontend:80
+}

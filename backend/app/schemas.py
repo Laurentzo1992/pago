@@ -110,8 +110,14 @@ class CommuneStat(BaseModel):
     count: int
 
 
+class ConditionStat(BaseModel):
+    etat: str
+    count: int
+
+
 class StatsOut(BaseModel):
     total: int
     by_category: list[CategoryStat]
     by_status: list[StatusStat]
     top_communes: list[CommuneStat]
+    by_condition: list[ConditionStat]

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import type { Infrastructure, TypeNode } from "../types";
 import { buildTypeIcons, fallbackIcon } from "../utils/icons";
+import { loadGeoOverlays } from "../utils/geoOverlays";
 
 declare const L: typeof import("leaflet");
 
@@ -46,13 +47,15 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
 
     streets.addTo(map);
 
-    L.control
+    const layersControl = L.control
       .layers(
         { "Plan": streets, "Satellite": satelliteImagery, "Hybride": hybrid },
         {},
         { position: "topright" },
       )
       .addTo(map);
+
+    loadGeoOverlays(map, layersControl);
 
     L.control.zoom({ position: "topright" }).addTo(map);
     L.control.scale({ metric: true, imperial: false, position: "bottomright" }).addTo(map);
@@ -95,7 +98,11 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
     iconsRef.current = buildTypeIcons(types);
   }, [types]);
 
-  // Rebuild markers whenever the filtered infrastructure list changes.
+  // Rebuild markers whenever the filtered infrastructure list changes, or the
+  // icon lookup is rebuilt - `types` and `infrastructures` load from two
+  // independent requests, so if icons arrive after infrastructures already
+  // did, markers must be redrawn once the real icons are ready instead of
+  // being stuck on the fallback dot.
   useEffect(() => {
     const markersCanvas = markersCanvasRef.current;
     if (!markersCanvas) return;
@@ -115,7 +122,7 @@ export default function MapView({ types, infrastructures, focusInfrastructureId 
     markersRef.current = markers;
     markersCanvas.clear();
     markersCanvas.addMarkers(Array.from(markers.values()));
-  }, [infrastructures]);
+  }, [infrastructures, types]);
 
   // Focus a marker when a result row is clicked.
   useEffect(() => {

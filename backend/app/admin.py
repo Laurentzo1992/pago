@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hmac
 import uuid
 from pathlib import Path
 
@@ -32,7 +33,9 @@ class AdminAuth(AuthenticationBackend):
         form = await request.form()
         username, password = form.get("username"), form.get("password")
 
-        if username != settings.admin_username or not settings.admin_password_hash:
+        if not settings.admin_password_hash or not hmac.compare_digest(
+            (username or "").encode(), settings.admin_username.encode()
+        ):
             return False
         try:
             valid = bcrypt.checkpw((password or "").encode(), settings.admin_password_hash.encode())

@@ -1,0 +1,64 @@
+services:
+  db:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: pago
+      POSTGRES_USER: pago
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pago -d pago"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    image: ghcr.io/${GHCR_OWNER:?GHCR_OWNER is required}/pago-backend:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ./.env.prod
+    environment:
+      DATABASE_URL: postgresql+psycopg://pago:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@db:5432/pago
+    volumes:
+      - ./backend/media:/app/media
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/api/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+
+  frontend:
+    image: ghcr.io/${GHCR_OWNER:?GHCR_OWNER is required}/pago-frontend:latest
+    restart: unless-stopped
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      default: {}
+      edge:
+        aliases:
+          - pago-frontend
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+volumes:
+  pgdata:
+
+networks:
+  # The kbbot-caddy container (shared reverse proxy for several sites on this
+  # VPS) already lives on this network - PAGO joins it too instead of running
+  # its own Caddy on ports 80/443. The "pago-frontend" alias above is how
+  # kbbot-caddy's Caddyfile reaches this stack - see DEPLOY.md.
+  edge:
+    external: true
+    name: ${CADDY_NETWORK:-kbbot_backend}

@@ -1,8 +1,9 @@
 from fastapi import APIRouter, Depends
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.filters import apply_infrastructure_filters
 from app.models import Infrastructure
 from app.schemas import (
     InfrastructureFilter,
@@ -15,14 +16,7 @@ router = APIRouter()
 
 
 def _filtered_query(filters: InfrastructureFilter | PaginatedInfrastructureFilter):
-    stmt = select(Infrastructure)
-    if filters.selected_types:
-        stmt = stmt.where(Infrastructure.type_id.in_(filters.selected_types))
-    if filters.selected_quarters:
-        stmt = stmt.where(Infrastructure.quartier_id.in_(filters.selected_quarters))
-    if isinstance(filters, InfrastructureFilter) and filters.selected_statuses:
-        stmt = stmt.where(Infrastructure.status_id.in_(filters.selected_statuses))
-    return stmt
+    return apply_infrastructure_filters(select(Infrastructure), filters)
 
 
 @router.post("/api/infrastructures", response_model=list[InfrastructureOut])
@@ -40,7 +34,7 @@ def get_infrastructures(filters: InfrastructureFilter, db: Session = Depends(get
 def get_paginated_infrastructures(filters: PaginatedInfrastructureFilter, db: Session = Depends(get_db)):
     base_stmt = _filtered_query(filters)
 
-    total_items = len(db.execute(base_stmt).scalars().all())
+    total_items = db.execute(select(func.count()).select_from(base_stmt.subquery())).scalar_one()
     page = max(filters.page, 1)
     page_size = max(filters.page_size, 1)
     pages = max((total_items + page_size - 1) // page_size, 1)

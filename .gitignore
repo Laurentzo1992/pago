@@ -4,6 +4,12 @@
 venv/
 
 backend/.env
+.env.prod
+# Raw GIS source drop (1.6G, mostly the out-of-scope 428k-parcel cadastre/
+# folder plus ~BROMIUM duplicate copies). The subset actually used is copied
+# into backend/scripts/data/geo/ and committed there instead - see
+# backend/scripts/convert_shapefiles.py.
+backend/Données/
 
 frontend/.env
 frontend/node_modules/

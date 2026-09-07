@@ -11,13 +11,15 @@ interface Props {
 export default function DonutChart({ data }: Props) {
   const total = data.reduce((sum, d) => sum + d.value, 0) || 1;
 
-  let cursor = 0;
-  const stops = data.map((d) => {
-    const start = (cursor / total) * 100;
-    cursor += d.value;
-    const end = (cursor / total) * 100;
-    return `${d.color} ${start}% ${end}%`;
-  });
+  const stops = data.reduce<{ cursor: number; segments: string[] }>(
+    (acc, d) => {
+      const start = (acc.cursor / total) * 100;
+      const cursor = acc.cursor + d.value;
+      const end = (cursor / total) * 100;
+      return { cursor, segments: [...acc.segments, `${d.color} ${start}% ${end}%`] };
+    },
+    { cursor: 0, segments: [] },
+  ).segments;
 
   return (
     <div className="pago-donut">

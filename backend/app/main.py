@@ -1,3 +1,5 @@
+import mimetypes
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
@@ -7,6 +9,10 @@ from app.admin import register_admin
 from app.config import BASE_DIR, settings
 from app.database import engine
 from app.routers import guides, infrastructures, locations, stats, status, types
+
+# Python's mimetypes module has no built-in mapping for .geojson, so
+# StaticFiles would otherwise serve the /geo/*.geojson overlays as text/plain.
+mimetypes.add_type("application/geo+json", ".geojson")
 
 app = FastAPI(title="PAGO API")
 
@@ -21,6 +27,7 @@ app.add_middleware(
 
 app.mount(settings.media_url, StaticFiles(directory=settings.media_root), name="media")
 app.mount("/admin-static", StaticFiles(directory=BASE_DIR / "app" / "admin_static"), name="admin-static")
+app.mount("/geo", StaticFiles(directory=BASE_DIR / "app" / "geo_static"), name="geo")
 
 app.include_router(types.router)
 app.include_router(locations.router)

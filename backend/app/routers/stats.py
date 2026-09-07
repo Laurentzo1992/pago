@@ -3,20 +3,18 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
+from app.filters import apply_infrastructure_filters
 from app.models import Arrondissement, Commune, Infrastructure, Quartier, Secteur, Status, Type
-from app.schemas import CategoryStat, CommuneStat, InfrastructureFilter, StatsOut, StatusStat
+from app.schemas import (
+    CategoryStat,
+    CommuneStat,
+    ConditionStat,
+    InfrastructureFilter,
+    StatsOut,
+    StatusStat,
+)
 
 router = APIRouter()
-
-
-def _apply_filters(stmt, filters: InfrastructureFilter):
-    if filters.selected_types:
-        stmt = stmt.where(Infrastructure.type_id.in_(filters.selected_types))
-    if filters.selected_quarters:
-        stmt = stmt.where(Infrastructure.quartier_id.in_(filters.selected_quarters))
-    if filters.selected_statuses:
-        stmt = stmt.where(Infrastructure.status_id.in_(filters.selected_statuses))
-    return stmt
 
 
 def _root_type_ids(db: Session) -> dict[int, int]:
@@ -41,10 +39,10 @@ def get_stats(filters: InfrastructureFilter, db: Session = Depends(get_db)):
     # Unlike /api/infrastructures, this always aggregates over whatever
     # filters are active (including none, i.e. the whole dataset) - there is
     # no "empty selection means empty result" rule for the analytics cards.
-    total = db.execute(_apply_filters(select(func.count(Infrastructure.id)), filters)).scalar_one()
+    total = db.execute(apply_infrastructure_filters(select(func.count(Infrastructure.id)), filters)).scalar_one()
 
     type_counts = db.execute(
-        _apply_filters(
+        apply_infrastructure_filters(
             select(Infrastructure.type_id, func.count().label("n")).group_by(Infrastructure.type_id), filters
         )
     ).all()
@@ -65,7 +63,7 @@ def get_stats(filters: InfrastructureFilter, db: Session = Depends(get_db)):
     ]
 
     status_counts = db.execute(
-        _apply_filters(
+        apply_infrastructure_filters(
             select(Infrastructure.status_id, func.count().label("n")).group_by(Infrastructure.status_id), filters
         )
     ).all()
@@ -79,7 +77,7 @@ def get_stats(filters: InfrastructureFilter, db: Session = Depends(get_db)):
         key=lambda s: -s.count,
     )
 
-    commune_stmt = _apply_filters(
+    commune_stmt = apply_infrastructure_filters(
         select(Commune.id, Commune.nom_commune, func.count().label("n"))
         .select_from(Infrastructure)
         .join(Quartier, Infrastructure.quartier_id == Quartier.id)
@@ -96,4 +94,24 @@ def get_stats(filters: InfrastructureFilter, db: Session = Depends(get_db)):
         for row in db.execute(commune_stmt).all()
     ]
 
-    return StatsOut(total=total, by_category=by_category, by_status=by_status, top_communes=top_communes)
+    condition_counts = db.execute(
+        apply_infrastructure_filters(
+            select(Infrastructure.etat, func.count().label("n")).group_by(Infrastructure.etat), filters
+        )
+    ).all()
+    by_condition = sorted(
+        (
+            ConditionStat(etat=row.etat, count=row.n)
+            for row in condition_counts
+            if row.etat and row.etat != "N/A"
+        ),
+        key=lambda c: -c.count,
+    )
+
+    return StatsOut(
+        total=total,
+        by_category=by_category,
+        by_status=by_status,
+        top_communes=top_communes,
+        by_condition=by_condition,
+    )

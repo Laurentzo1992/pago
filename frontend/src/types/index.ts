@@ -63,11 +63,17 @@ export interface CommuneStat {
   count: number;
 }
 
+export interface ConditionStat {
+  etat: string;
+  count: number;
+}
+
 export interface Stats {
   total: number;
   by_category: CategoryStat[];
   by_status: StatusStat[];
   top_communes: CommuneStat[];
+  by_condition: ConditionStat[];
 }
 
 export interface Infrastructure {

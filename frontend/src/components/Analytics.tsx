@@ -1,17 +1,38 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Stats, StatusItem, TypeNode } from "../types";
 import { categoricalColor, FALLBACK_COLOR } from "../utils/colors";
 import AnalyticsCard, { type CardPosition } from "./AnalyticsCard";
 import BarChart from "./BarChart";
 import DonutChart from "./DonutChart";
 
-type CardId = "category" | "status" | "communes";
+type SectionId = "category" | "status" | "communes" | "condition";
+type SectionMode = "docked" | "detached" | "closed";
 
-const CARD_DEFS: { id: CardId; title: string; icon: string }[] = [
+const SECTION_DEFS: { id: SectionId; title: string; icon: string }[] = [
   { id: "category", title: "Par catégorie", icon: "fas fa-chart-bar" },
   { id: "status", title: "Par statut", icon: "fas fa-chart-pie" },
   { id: "communes", title: "Top communes", icon: "fas fa-city" },
+  { id: "condition", title: "État du bâti", icon: "fas fa-house-chimney-crack" },
 ];
+
+// Severity-ordered (worst to best) rather than by count, with a matching
+// red-to-green scale - the raw strings come straight from the source data,
+// double space in "Bon  état" included.
+const CONDITION_ORDER = ["Très mauvais état", "Mauvais état", "Bon  état", "Très bon état"];
+const CONDITION_COLORS: Record<string, string> = {
+  "Très mauvais état": "#b3413b",
+  "Mauvais état": "#d97706",
+  "Bon  état": "#65a30d",
+  "Très bon état": "#1b5e46",
+};
+
+function dockedDefaultPosition(): CardPosition {
+  return { x: Math.max(window.innerWidth - 400, 20), y: 76 };
+}
+
+function initialModes(): Record<SectionId, SectionMode> {
+  return { category: "docked", status: "docked", communes: "docked", condition: "docked" };
+}
 
 interface Props {
   visible: boolean;
@@ -22,12 +43,23 @@ interface Props {
 }
 
 export default function Analytics({ visible, stats, types, statuses, onClose }: Props) {
-  const [positions, setPositions] = useState<Record<CardId, CardPosition | null>>({
-    category: null,
-    status: null,
-    communes: null,
+  const [dockedPosition, setDockedPosition] = useState<CardPosition>(dockedDefaultPosition);
+  const [mode, setMode] = useState<Record<SectionId, SectionMode>>(initialModes);
+  const [positions, setPositions] = useState<Record<SectionId, CardPosition>>({
+    category: { x: 0, y: 0 },
+    status: { x: 0, y: 0 },
+    communes: { x: 0, y: 0 },
+    condition: { x: 0, y: 0 },
   });
-  const [order, setOrder] = useState<CardId[]>(["category", "status", "communes"]);
+
+  // Reset to the default (everything docked together) whenever the feature
+  // is reopened from the header toggle.
+  useEffect(() => {
+    if (visible) {
+      setMode(initialModes());
+      setDockedPosition(dockedDefaultPosition());
+    }
+  }, [visible]);
 
   if (!visible || !stats) return null;
 
@@ -40,30 +72,19 @@ export default function Analytics({ visible, stats, types, statuses, onClose }: 
     return idx === -1 ? FALLBACK_COLOR : categoricalColor(idx, Math.max(statuses.length, 2));
   };
 
-  const bringToFront = (id: CardId) => setOrder((prev) => [...prev.filter((x) => x !== id), id]);
+  const detachedCount = SECTION_DEFS.filter((s) => mode[s.id] === "detached").length;
 
-  const detach = (id: CardId) => {
-    const offset = order.indexOf(id) * 28;
-    setPositions((prev) => ({ ...prev, [id]: { x: 100 + offset, y: 90 + offset } }));
-    bringToFront(id);
+  const detach = (id: SectionId) => {
+    const offset = detachedCount * 28;
+    setPositions((prev) => ({ ...prev, [id]: { x: 140 + offset, y: 100 + offset } }));
+    setMode((prev) => ({ ...prev, [id]: "detached" }));
   };
-  const dock = (id: CardId) => setPositions((prev) => ({ ...prev, [id]: null }));
-  const move = (id: CardId, dx: number, dy: number) =>
-    setPositions((prev) => {
-      const pos = prev[id];
-      if (!pos) return prev;
-      const maxX = Math.max(window.innerWidth - 60, 0);
-      const maxY = Math.max(window.innerHeight - 40, 0);
-      return {
-        ...prev,
-        [id]: {
-          x: Math.min(Math.max(pos.x + dx, -240), maxX),
-          y: Math.min(Math.max(pos.y + dy, 0), maxY),
-        },
-      };
-    });
+  const close = (id: SectionId) => setMode((prev) => ({ ...prev, [id]: "closed" }));
+  const moveDocked = (dx: number, dy: number) => setDockedPosition((prev) => clampMove(prev, dx, dy));
+  const moveDetached = (id: SectionId, dx: number, dy: number) =>
+    setPositions((prev) => ({ ...prev, [id]: clampMove(prev[id], dx, dy) }));
 
-  const renderCardBody = (id: CardId) => {
+  const renderChart = (id: SectionId) => {
     if (id === "category") {
       return (
         <BarChart
@@ -78,6 +99,16 @@ export default function Analytics({ visible, stats, types, statuses, onClose }: 
         />
       );
     }
+    if (id === "condition") {
+      const sorted = [...stats.by_condition].sort(
+        (a, b) => CONDITION_ORDER.indexOf(a.etat) - CONDITION_ORDER.indexOf(b.etat),
+      );
+      return (
+        <DonutChart
+          data={sorted.map((c) => ({ label: c.etat.trim(), value: c.count, color: CONDITION_COLORS[c.etat] ?? FALLBACK_COLOR }))}
+        />
+      );
+    }
     return (
       <BarChart
         data={stats.top_communes.map((c, i) => ({
@@ -89,55 +120,61 @@ export default function Analytics({ visible, stats, types, statuses, onClose }: 
     );
   };
 
-  const docked = CARD_DEFS.filter((c) => !positions[c.id]);
-  const floating = CARD_DEFS.filter((c) => positions[c.id]);
+  const dockedSections = SECTION_DEFS.filter((s) => mode[s.id] === "docked");
+  const detachedSections = SECTION_DEFS.filter((s) => mode[s.id] === "detached");
 
   return (
     <>
-      <div id="analytics_panel">
-        <div className="pago-legend-header">
-          <span className="pago-legend-title">Statistiques · {stats.total.toLocaleString("fr-FR")} infrastructures</span>
-          <button className="close" onClick={onClose} aria-label="Fermer les statistiques">
-            &times;
-          </button>
-        </div>
-        {docked.length === 0 && (
-          <p className="pago-analytics-empty">Toutes les cartes sont détachées sur la carte.</p>
-        )}
-        {docked.map((c) => (
-          <AnalyticsCard
-            key={c.id}
-            title={c.title}
-            icon={c.icon}
-            detached={false}
-            position={null}
-            zIndex={0}
-            onDetach={() => detach(c.id)}
-            onDock={() => dock(c.id)}
-            onMove={() => {}}
-            onFocus={() => {}}
-          >
-            {renderCardBody(c.id)}
-          </AnalyticsCard>
-        ))}
-      </div>
-
-      {floating.map((c) => (
+      {dockedSections.length > 0 && (
         <AnalyticsCard
-          key={c.id}
-          title={c.title}
-          icon={c.icon}
-          detached
-          position={positions[c.id]}
-          zIndex={1200 + order.indexOf(c.id)}
-          onDetach={() => detach(c.id)}
-          onDock={() => dock(c.id)}
-          onMove={(dx, dy) => move(c.id, dx, dy)}
-          onFocus={() => bringToFront(c.id)}
+          title={`Statistiques · ${stats.total.toLocaleString("fr-FR")} infrastructures`}
+          icon="fas fa-chart-simple"
+          position={dockedPosition}
+          onClose={onClose}
+          onMove={moveDocked}
         >
-          {renderCardBody(c.id)}
+          {dockedSections.map((s) => (
+            <section className="pago-analytics-section" key={s.id}>
+              <h4 className="pago-analytics-section-title">
+                <i className={s.icon} />
+                <span className="pago-analytics-section-title-text">{s.title}</span>
+                <button
+                  className="pago-analytics-card-btn"
+                  onPointerDown={(e) => e.stopPropagation()}
+                  onClick={() => detach(s.id)}
+                  title="Détacher"
+                >
+                  <i className="fas fa-up-right-and-down-left-from-center" />
+                </button>
+              </h4>
+              {renderChart(s.id)}
+            </section>
+          ))}
+        </AnalyticsCard>
+      )}
+
+      {detachedSections.map((s, i) => (
+        <AnalyticsCard
+          key={s.id}
+          title={s.title}
+          icon={s.icon}
+          position={positions[s.id]}
+          zIndex={1300 + i}
+          onClose={() => close(s.id)}
+          onMove={(dx, dy) => moveDetached(s.id, dx, dy)}
+        >
+          {renderChart(s.id)}
         </AnalyticsCard>
       ))}
     </>
   );
+}
+
+function clampMove(pos: CardPosition, dx: number, dy: number): CardPosition {
+  const maxX = Math.max(window.innerWidth - 60, 0);
+  const maxY = Math.max(window.innerHeight - 40, 0);
+  return {
+    x: Math.min(Math.max(pos.x + dx, -240), maxX),
+    y: Math.min(Math.max(pos.y + dy, 0), maxY),
+  };
 }
